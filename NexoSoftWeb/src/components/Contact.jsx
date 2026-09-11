@@ -1,28 +1,61 @@
 import { useState } from 'react'
 import { NEED_OPTIONS } from '../content'
 
+const EMPTY_FORM = {
+  name: '',
+  email: '',
+  need: NEED_OPTIONS[0],
+  message: '',
+  company: '',
+}
+
 export default function Contact() {
-  const [form, setField] = useState({
-    name: '',
-    email: '',
-    need: NEED_OPTIONS[0],
-    message: '',
-  })
+  const [form, setField] = useState(EMPTY_FORM)
   const [status, setStatus] = useState('')
+  const [sending, setSending] = useState(false)
 
   function onChange(event) {
     const { name, value } = event.target
     setField((current) => ({ ...current, [name]: value }))
   }
 
-  function onSubmit(event) {
+  async function onSubmit(event) {
     event.preventDefault()
-    const subject = encodeURIComponent(`Briefing: ${form.need} — ${form.name}`)
-    const body = encodeURIComponent(
-      `Nombre: ${form.name}\nEmail: ${form.email}\nServicio: ${form.need}\n\n${form.message}`,
-    )
-    window.location.href = `mailto:hola@nexostudio.dev?subject=${subject}&body=${body}`
-    setStatus('Listo. Se abre tu mail con el briefing. Si no se abre, escribime directo.')
+    if (form.company) {
+      setStatus('Listo. Te escribo en 24–48h.')
+      return
+    }
+
+    setSending(true)
+    setStatus('Enviando…')
+
+    try {
+      const response = await fetch('/send-briefing.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          need: form.need,
+          message: form.message,
+          company: form.company,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('send-failed')
+      }
+
+      setField(EMPTY_FORM)
+      setStatus('Listo. El briefing llegó a leonexo@nexosoft.site. Te escribo en 24–48h.')
+    } catch {
+      setStatus('No se pudo enviar desde el sitio. Escribime a leonexo@nexosoft.site')
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -39,6 +72,16 @@ export default function Contact() {
         </p>
       </div>
       <form onSubmit={onSubmit}>
+        <label className="hp" aria-hidden="true">
+          Empresa
+          <input
+            name="company"
+            tabIndex={-1}
+            autoComplete="off"
+            value={form.company}
+            onChange={onChange}
+          />
+        </label>
         <label>
           Nombre
           <input
@@ -78,8 +121,8 @@ export default function Contact() {
             onChange={onChange}
           />
         </label>
-        <button className="btn primary" type="submit">
-          Enviar briefing
+        <button className="btn primary" type="submit" disabled={sending}>
+          {sending ? 'Enviando…' : 'Enviar briefing'}
         </button>
         {status ? <p className="form-note">{status}</p> : null}
       </form>

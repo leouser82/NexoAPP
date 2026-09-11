@@ -59,6 +59,31 @@ function sglPreviewSpaFallback(req, res, next) {
   next()
 }
 
+function briefingDevEndpoint() {
+  return {
+    name: 'briefing-dev-endpoint',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const url = (req.url || '').split('?')[0]
+        if (req.method !== 'POST' || url !== '/send-briefing.php') {
+          return next()
+        }
+        const chunks = []
+        req.on('data', (chunk) => chunks.push(chunk))
+        req.on('end', () => {
+          const payload = JSON.stringify({ ok: true, dev: true })
+          console.log('[briefing]', Buffer.concat(chunks).toString('utf8'))
+          res.writeHead(200, {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Content-Length': Buffer.byteLength(payload),
+          })
+          res.end(payload)
+        })
+      })
+    },
+  }
+}
+
 function embedSinGlutenLife() {
   return {
     name: 'embed-singluten-life',
@@ -119,7 +144,7 @@ function embedSinGlutenLife() {
 }
 
 export default defineConfig({
-  plugins: [react(), embedSinGlutenLife()],
+  plugins: [react(), briefingDevEndpoint(), embedSinGlutenLife()],
   server: {
     host: '127.0.0.1',
     port: 5180,
