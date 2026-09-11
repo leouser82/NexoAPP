@@ -5,6 +5,14 @@ const OVERPASS_ENDPOINTS = [
   'https://overpass.kumi.systems/api/interpreter',
 ]
 
+const LOCAL_KM = 5
+const RESTAURANT_KM = 50
+const MAX_RESTAURANTS = 50
+
+function maxKmFor(place) {
+  return place.type === 'Restaurante' ? RESTAURANT_KM : LOCAL_KM
+}
+
 function coordsOf(el) {
   if (Number.isFinite(el.lat) && Number.isFinite(el.lon)) {
     return { lat: el.lat, lon: el.lon }
@@ -43,6 +51,9 @@ function classify(tags = {}, name = '') {
   if (shop === 'bakery' || /panader/.test(name.toLowerCase())) {
     return { type: 'Panadería', category: 'comida' }
   }
+  if (shop === 'confectionery' || /confiter/.test(name.toLowerCase())) {
+    return { type: 'Confitería', category: 'comida' }
+  }
   if (shop === 'health_food' || /diet[eé]tica/.test(name.toLowerCase())) {
     return { type: 'Dietética', category: 'comida' }
   }
@@ -55,7 +66,14 @@ function classify(tags = {}, name = '') {
   if (amenity === 'cafe' || amenity === 'ice_cream') {
     return { type: 'Café', category: 'comida' }
   }
+  if (amenity === 'restaurant' || /restaurant|parrilla|resto/i.test(`${name} ${osmHint(tags)}`)) {
+    return { type: 'Restaurante', category: 'comida' }
+  }
   return { type: 'Restaurante', category: 'comida' }
+}
+
+function osmHint(tags = {}) {
+  return `${tags.amenity || ''} ${tags.shop || ''}`
 }
 
 function toPlace(el, origin) {
@@ -89,15 +107,21 @@ function toPlace(el, origin) {
 }
 
 function overpassQuery(lat, lon) {
+  const local = LOCAL_KM * 1000
+  const far = RESTAURANT_KM * 1000
   return `
 [out:json][timeout:18];
 (
-  node["diet:gluten_free"~"yes|only"](around:6000,${lat},${lon});
-  node["name"~"tacc|celiac",i](around:6000,${lat},${lon});
-  node["shop"="bakery"](around:4000,${lat},${lon});
-  node["shop"="health_food"](around:5000,${lat},${lon});
-  node["amenity"="pharmacy"](around:4000,${lat},${lon});
-  node["amenity"="cafe"](around:2500,${lat},${lon});
+  node["diet:gluten_free"~"yes|only"](around:${far},${lat},${lon});
+  node["name"~"tacc|celiac",i](around:${far},${lat},${lon});
+  node["amenity"="restaurant"]["diet:gluten_free"~"yes|only"](around:${far},${lat},${lon});
+  node["amenity"="restaurant"](around:${local},${lat},${lon});
+  node["shop"="bakery"](around:${local},${lat},${lon});
+  node["shop"="confectionery"](around:${local},${lat},${lon});
+  node["shop"="health_food"](around:${local},${lat},${lon});
+  node["amenity"="pharmacy"](around:${local},${lat},${lon});
+  node["amenity"="cafe"](around:${local},${lat},${lon});
+  node["amenity"="fast_food"](around:${local},${lat},${lon});
 );
 out body;
 `.trim()
@@ -167,7 +191,7 @@ function photonToPlace(feature, origin) {
 }
 
 function isGenericName(name) {
-  return /^(panader[ií]a|farmacia|diet[eé]tica|cafeter[ií]a|restaurante)$/i.test(String(name).trim())
+  return /^(panader[ií]a|farmacia|diet[eé]tica|cafeter[ií]a|confiter[ií]a|restaurante)$/i.test(String(name).trim())
 }
 
 function mergePlaces(list) {
@@ -188,7 +212,10 @@ function mergePlaces(list) {
 }
 
 function splitPlaces(list) {
-  const all = mergePlaces(list).filter((p) => p.distanceKm <= 12)
+  const merged = mergePlaces(list).filter((p) => p.distanceKm <= maxKmFor(p))
+  const restaurants = merged.filter((p) => p.type === 'Restaurante').slice(0, MAX_RESTAURANTS)
+  const others = merged.filter((p) => p.type !== 'Restaurante')
+  const all = [...restaurants, ...others].sort((a, b) => a.distanceKm - b.distanceKm)
   return {
     all,
     places: all.filter((p) => p.category === 'comida'),
@@ -202,7 +229,11 @@ async function loadPhotonPlaces(origin) {
     fetchPhoton('celiaco', origin.lat, origin.lon),
     fetchPhoton('dietetica', origin.lat, origin.lon),
     fetchPhoton('panaderia', origin.lat, origin.lon),
+    fetchPhoton('confiteria', origin.lat, origin.lon),
     fetchPhoton('farmacia', origin.lat, origin.lon),
+    fetchPhoton('restaurante', origin.lat, origin.lon),
+    fetchPhoton('restaurante sin tacc', origin.lat, origin.lon),
+    fetchPhoton('parrilla', origin.lat, origin.lon),
   ])
   return results.flatMap((result) => (result.status === 'fulfilled' ? result.value : [])).map((feature) =>
     photonToPlace(feature, origin),

@@ -33,8 +33,8 @@ export default function Lugares() {
       </div>
       <h2 className="page-title">¿Dónde comemos hoy?</h2>
       <p className="note" style={{ margin: '0 0 14px' }}>
-        Panaderías, restaurantes y dietéticas cerca tuyo. El sello Sin TACC sale de datos abiertos;
-        si dice “A confirmar”, preguntá en el local.
+        Panaderías, confiterías y dietéticas a 5 km. Restaurantes, los más cercanos hasta 50 km.
+        Si dice “A confirmar”, preguntá en el local.
       </p>
       <input
         className="search"
