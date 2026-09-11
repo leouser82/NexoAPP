@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { BrandMark, IconBook, IconHome, IconMeal, IconPill, IconPin, IconShop } from './Icons.jsx'
-import { user } from '../data/mock.js'
+import { useLocationData } from '../geo/LocationContext.jsx'
 
 const links = [
   { to: '/', label: 'Inicio', icon: IconHome, end: true },
@@ -11,14 +11,16 @@ const links = [
 ]
 
 export default function Layout() {
+  const { label, status, locate, source } = useLocationData()
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
         <nav className="bottom-nav">
-          {links.map(({ to, label, icon: Ico, end }) => (
+          {links.map(({ to, label: text, icon: Ico, end }) => (
             <NavLink key={to} to={to} end={end} className={({ isActive }) => (isActive ? 'active' : '')}>
               <Ico />
-              {label}
+              {text}
             </NavLink>
           ))}
         </nav>
@@ -33,10 +35,13 @@ export default function Layout() {
               <p>Comé rico. Comé seguro.</p>
             </div>
           </div>
-          <div className="chip-location">
+          <button type="button" className="chip-location" onClick={locate} title="Actualizar ubicación">
             <IconPin />
-            {user.neighborhood}
-          </div>
+            <span>
+              {status === 'locating' ? 'Buscando…' : label}
+              {source === 'ip' && status === 'ready' ? ' (aprox.)' : ''}
+            </span>
+          </button>
         </header>
         <Outlet />
       </div>

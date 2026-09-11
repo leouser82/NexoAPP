@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom'
-import { dailyMeals, pharmacies, places, recipes, user } from '../data/mock.js'
+import { dailyMeals, recipes, user } from '../data/mock.js'
+import { formatDistance } from '../geo/geo.js'
+import { useLocationData } from '../geo/LocationContext.jsx'
 
 export default function Home() {
-  const nearest = [...places, ...pharmacies].sort((a, b) => a.distanceKm - b.distanceKm)[0]
+  const { places, pharmacies, placesStatus, label } = useLocationData()
+  const nearby = [...places, ...pharmacies].sort((a, b) => a.distanceKm - b.distanceKm)
+  const nearest = nearby[0]
   const todayCost = dailyMeals.reduce((s, m) => s + m.cost, 0)
 
   return (
@@ -10,7 +14,10 @@ export default function Home() {
       <section className="hero">
         <div className="hero-kicker">Tu día sin TACC</div>
         <h2>Hola {user.name}, hoy la mesa está de tu lado.</h2>
-        <p>Locales cerca, el menú del día y recetas que respetan tu presupuesto. Sin vueltas, sin gluten.</p>
+        <p>
+          Locales cerca de {label === 'Buscando…' ? 'vos' : label}, el menú del día y recetas que
+          respetan tu presupuesto.
+        </p>
         <div className="hero-actions">
           <Link className="btn btn-light" to="/lugares">
             Ver qué hay cerca
@@ -33,14 +40,22 @@ export default function Home() {
           <span className="ico blue">🍽</span>
           <div>
             <h4>Comida cerca</h4>
-            <span>{places.length} opciones listas para salir</span>
+            <span>
+              {placesStatus === 'loading'
+                ? 'Buscando locales…'
+                : `${places.length} opciones cerca tuyo`}
+            </span>
           </div>
         </Link>
         <Link className="quick-card" to="/farmacias">
           <span className="ico sky">💊</span>
           <div>
             <h4>Farmacias</h4>
-            <span>Góndola sin TACC a mano</span>
+            <span>
+              {placesStatus === 'loading'
+                ? 'Buscando farmacias…'
+                : `${pharmacies.length} a un paso`}
+            </span>
           </div>
         </Link>
         <Link className="quick-card" to="/menu">
@@ -63,12 +78,21 @@ export default function Home() {
         <h3>A un paso tuyo</h3>
         <Link to="/lugares">Ver todas</Link>
       </div>
-      <article className="card">
-        <h4 style={{ margin: '0 0 4px' }}>{nearest.name}</h4>
-        <p className="meta" style={{ margin: 0 }}>
-          {nearest.type} · {nearest.distanceKm} km · {nearest.address}
+      {nearest ? (
+        <article className="card">
+          <h4 style={{ margin: '0 0 4px' }}>{nearest.name}</h4>
+          <p className="meta" style={{ margin: 0 }}>
+            {nearest.type} · {formatDistance(nearest.distanceKm)}
+            {nearest.address ? ` · ${nearest.address}` : ''}
+          </p>
+        </article>
+      ) : (
+        <p className="note">
+          {placesStatus === 'loading'
+            ? 'Estamos midiendo qué hay cerca de tu ubicación…'
+            : 'Todavía no encontramos lugares cerca. Probá actualizar la ubicación.'}
         </p>
-      </article>
+      )}
 
       <div className="section-head">
         <h3>Una idea rica y económica</h3>

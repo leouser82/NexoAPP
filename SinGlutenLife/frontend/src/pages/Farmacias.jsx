@@ -1,23 +1,28 @@
 import { useState } from 'react'
 import PlaceCard from '../components/PlaceCard.jsx'
-import { pharmacies } from '../data/mock.js'
+import { useLocationData } from '../geo/LocationContext.jsx'
 
 export default function Farmacias() {
+  const { pharmacies, placesStatus, label, locate, status } = useLocationData()
   const [q, setQ] = useState('')
-  const list = pharmacies.filter((p) => `${p.name} ${p.products.join(' ')}`.toLowerCase().includes(q.toLowerCase()))
+  const list = pharmacies.filter((p) =>
+    `${p.name} ${(p.products || []).join(' ')} ${p.address || ''}`.toLowerCase().includes(q.toLowerCase()),
+  )
 
   return (
     <main className="page">
       <div className="banner-proto">
-        Prototipo visual. Después cruzamos esto con el padrón ANMAT y el stock de las cadenas.
+        {status === 'locating' || placesStatus === 'loading'
+          ? `Buscando farmacias cerca de ${label}…`
+          : `Farmacias reales cerca de ${label}. En Argentina suelen tener góndola sin TACC.`}
       </div>
       <h2 className="page-title">Farmacia, sin adivinar</h2>
       <p className="note" style={{ margin: '0 0 14px' }}>
-        Galletitas, premezclas y snacks con sello. Cerca y listos.
+        Las más cercanas a vos, con distancia real. Confirmá el sello en la góndola.
       </p>
       <input
         className="search"
-        placeholder="Galletitas, premezcla, barras…"
+        placeholder="Nombre o barrio…"
         value={q}
         onChange={(e) => setQ(e.target.value)}
       />
@@ -26,7 +31,7 @@ export default function Farmacias() {
           <PlaceCard
             key={p.id}
             place={p}
-            extra={p.products.slice(0, 2).map((prod) => (
+            extra={(p.products || []).slice(0, 2).map((prod) => (
               <span className="tag ok" key={prod}>
                 {prod}
               </span>
@@ -34,6 +39,15 @@ export default function Farmacias() {
           />
         ))}
       </div>
+      {placesStatus === 'loading' && <p className="note">Cargando farmacias cercanas…</p>}
+      {placesStatus === 'ready' && list.length === 0 && (
+        <p className="note">
+          No encontramos farmacias cerca.{' '}
+          <button type="button" className="text-btn" onClick={locate}>
+            Actualizar ubicación
+          </button>
+        </p>
+      )}
     </main>
   )
 }

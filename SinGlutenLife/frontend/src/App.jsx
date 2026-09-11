@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout.jsx'
+import { LocationProvider } from './geo/LocationContext.jsx'
 import Farmacias from './pages/Farmacias.jsx'
 import Home from './pages/Home.jsx'
 import Lugares from './pages/Lugares.jsx'
@@ -11,18 +12,20 @@ const basename = import.meta.env.BASE_URL.replace(/\/$/, '') || undefined
 
 export default function App() {
   return (
-    <BrowserRouter basename={basename}>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="lugares" element={<Lugares />} />
-          <Route path="farmacias" element={<Farmacias />} />
-          <Route path="menu" element={<MenuDelDia />} />
-          <Route path="recetas" element={<Recetas />} />
-          <Route path="recetas/:id" element={<RecetaDetalle />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <LocationProvider>
+      <BrowserRouter basename={basename}>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="lugares" element={<Lugares />} />
+            <Route path="farmacias" element={<Farmacias />} />
+            <Route path="menu" element={<MenuDelDia />} />
+            <Route path="recetas" element={<Recetas />} />
+            <Route path="recetas/:id" element={<RecetaDetalle />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </LocationProvider>
   )
 }

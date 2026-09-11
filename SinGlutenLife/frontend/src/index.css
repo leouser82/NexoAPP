@@ -104,6 +104,17 @@ a {
   display: flex;
   gap: 6px;
   align-items: center;
+  max-width: 46%;
+  cursor: pointer;
+  text-align: left;
+  appearance: none;
+  font: inherit;
+}
+
+.chip-location span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .page {
@@ -503,6 +514,22 @@ input[type='range'] {
 
 .steps li {
   margin-bottom: 8px;
+}
+
+.maps-link {
+  display: block;
+  margin-top: 4px;
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.text-btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--blue);
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .banner-proto {
