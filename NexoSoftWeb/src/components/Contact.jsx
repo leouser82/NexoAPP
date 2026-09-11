@@ -1,12 +1,36 @@
 import { useState } from 'react'
 import { NEED_OPTIONS } from '../content'
 
+const MAILBOX = 'leonexo@nexosoft.site'
 const EMPTY_FORM = {
   name: '',
   email: '',
   need: NEED_OPTIONS[0],
   message: '',
   company: '',
+}
+
+async function sendBriefing(fields) {
+  const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(MAILBOX)}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({
+      name: fields.name,
+      email: fields.email,
+      need: fields.need,
+      message: fields.message,
+      _replyto: fields.email,
+      _subject: `Briefing: ${fields.need} — ${fields.name}`,
+      _template: 'table',
+      _captcha: false,
+    }),
+  })
+
+  const data = await response.json().catch(() => ({}))
+  return { response, data }
 }
 
 export default function Contact() {
@@ -30,23 +54,19 @@ export default function Contact() {
     setStatus('Enviando…')
 
     try {
-      const response = await fetch('/send-briefing.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          need: form.need,
-          message: form.message,
-          company: form.company,
-        }),
-      })
+      const { response, data } = await sendBriefing(form)
+      const message = String(data.message || '')
+      const failed = String(data.success) === 'false'
 
-      if (!response.ok) {
-        throw new Error('send-failed')
+      if (failed && /activate|confirm|email|web server/i.test(message)) {
+        setStatus(
+          'Te acaba de llegar un mail a leonexo@nexosoft.site para activar el formulario. Abrilo (también spam), confirmá el link y volvé a enviar el briefing.',
+        )
+        return
+      }
+
+      if (!response.ok || failed) {
+        throw new Error(message || 'send-failed')
       }
 
       setField(EMPTY_FORM)
