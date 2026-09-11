@@ -7,6 +7,7 @@ import { build as viteBuild, createServer, defineConfig } from 'vite'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const SGL_ROOT = path.resolve(__dirname, '../SinGlutenLife/frontend')
 const SGL_BASE = '/singluten/'
+const NEXO_MODULES = path.resolve(__dirname, 'node_modules')
 const SGL_HTACCESS = `RewriteEngine On
 RewriteBase /singluten/
 RewriteRule ^index\\.html$ - [L]
@@ -16,6 +17,28 @@ RewriteRule . /singluten/index.html [L]
 `
 
 let sglServer
+
+function pkg(name) {
+  return path.join(NEXO_MODULES, name)
+}
+
+function sglInlineConfig(extra = {}) {
+  return {
+    configFile: false,
+    root: SGL_ROOT,
+    base: SGL_BASE,
+    appType: 'spa',
+    plugins: [react()],
+    resolve: {
+      alias: {
+        react: pkg('react'),
+        'react-dom': pkg('react-dom'),
+        'react-router-dom': pkg('react-router-dom'),
+      },
+    },
+    ...extra,
+  }
+}
 
 function redirectBareSingluten(req, res, next) {
   const url = req.url || ''
@@ -41,19 +64,17 @@ function embedSinGlutenLife() {
     name: 'embed-singluten-life',
     async configureServer(nexo) {
       if (!sglServer) {
-        sglServer = await createServer({
-          configFile: path.join(SGL_ROOT, 'vite.config.js'),
-          root: SGL_ROOT,
-          base: SGL_BASE,
-          appType: 'spa',
-          server: {
-            middlewareMode: true,
-            fs: { allow: [SGL_ROOT] },
-            hmr: {
-              server: nexo.httpServer,
+        sglServer = await createServer(
+          sglInlineConfig({
+            server: {
+              middlewareMode: true,
+              fs: { allow: [SGL_ROOT, __dirname] },
+              hmr: {
+                server: nexo.httpServer,
+              },
             },
-          },
-        })
+          }),
+        )
       }
 
       console.log('[nexo] SinGluten Life montada en http://127.0.0.1:5180/singluten/')
@@ -82,15 +103,14 @@ function embedSinGlutenLife() {
       order: 'post',
       async handler() {
         const outDir = path.resolve(__dirname, 'dist/singluten')
-        await viteBuild({
-          configFile: path.join(SGL_ROOT, 'vite.config.js'),
-          root: SGL_ROOT,
-          base: SGL_BASE,
-          build: {
-            outDir,
-            emptyOutDir: true,
-          },
-        })
+        await viteBuild(
+          sglInlineConfig({
+            build: {
+              outDir,
+              emptyOutDir: true,
+            },
+          }),
+        )
         fs.writeFileSync(path.join(outDir, '.htaccess'), SGL_HTACCESS)
         console.log('[nexo] SinGluten Life compilada en dist/singluten/')
       },
