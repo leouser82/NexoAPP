@@ -5,7 +5,7 @@ export default function Services() {
     <section id="servicios" className="services">
       <div className="section-head">
         <p className="kicker">Qué te llevás</p>
-        <h2>Un sistema web pensado para gente que tiene un negocio, no para programadores.</h2>
+        <h2>Un sistema web pensado para gente que tiene un negocio.</h2>
       </div>
       <div className="service-grid">
         {SERVICES.map((service) => (
