@@ -102,6 +102,14 @@ function toPlace(el, origin) {
     certified,
     phone: tags.phone || tags['contact:phone'] || '',
     website: tags.website || tags['contact:website'] || '',
+    menuUrl: tags.menu || tags['contact:menu'] || '',
+    cuisine: tags.cuisine || '',
+    description: tags.description || '',
+    image: tags.image || tags['image:url'] || '',
+    wikidata: tags.wikidata || '',
+    wikipedia: tags.wikipedia || '',
+    osmType: el.type || 'node',
+    osmId: el.id,
     products: kind.category === 'farmacia' ? ['Alimentos sin TACC', 'Premezclas', 'Snacks'] : [],
   }
 }
@@ -187,6 +195,15 @@ function photonToPlace(feature, origin) {
     tags: certified ? [] : ['Cerca'],
     certified,
     products: kind.category === 'farmacia' ? ['Alimentos sin TACC'] : [],
+    website: props.website || '',
+    menuUrl: '',
+    cuisine: props.osm_value === 'restaurant' ? '' : '',
+    description: '',
+    image: '',
+    wikidata: '',
+    wikipedia: '',
+    osmType: ({ N: 'node', W: 'way', R: 'relation' }[props.osm_type] || '').toLowerCase() || (props.osm_type || ''),
+    osmId: props.osm_id || '',
   }
 }
 

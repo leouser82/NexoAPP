@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { rememberPlaces } from './placeCache.js'
 import { detectLocation } from './geo.js'
 import { fetchNearbyPlaces } from './places.js'
 
@@ -30,12 +31,14 @@ export function LocationProvider({ children }) {
       const nearby = await fetchNearbyPlaces(lat, lon, (partial) => {
         setPlaces(partial.places)
         setPharmacies(partial.pharmacies)
+        rememberPlaces(partial.places, partial.pharmacies)
         if (partial.places.length + partial.pharmacies.length > 0) {
           setPlacesStatus('ready')
         }
       })
       setPlaces(nearby.places)
       setPharmacies(nearby.pharmacies)
+      rememberPlaces(nearby.places, nearby.pharmacies)
       setPlacesStatus('ready')
     } catch {
       setPlacesStatus('error')

@@ -5,6 +5,7 @@ import Farmacias from './pages/Farmacias.jsx'
 import Home from './pages/Home.jsx'
 import Lugares from './pages/Lugares.jsx'
 import MenuDelDia from './pages/MenuDelDia.jsx'
+import PlaceDetalle from './pages/PlaceDetalle.jsx'
 import RecetaDetalle from './pages/RecetaDetalle.jsx'
 import Recetas from './pages/Recetas.jsx'
 
@@ -19,6 +20,7 @@ export default function App() {
             <Route index element={<Home />} />
             <Route path="lugares" element={<Lugares />} />
             <Route path="farmacias" element={<Farmacias />} />
+            <Route path="lugar/:id" element={<PlaceDetalle />} />
             <Route path="menu" element={<MenuDelDia />} />
             <Route path="recetas" element={<Recetas />} />
             <Route path="recetas/:id" element={<RecetaDetalle />} />

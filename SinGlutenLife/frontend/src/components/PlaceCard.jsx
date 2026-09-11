@@ -1,10 +1,22 @@
+import { Link } from 'react-router-dom'
+import { cardPhoto, categoryPhoto } from '../geo/placeMedia.js'
 import { formatDistance, mapsUrl } from '../geo/geo.js'
 
-export default function PlaceCard({ place, extra }) {
+export default function PlaceCard({ place, extra, to }) {
   const dist = formatDistance(place.distanceKm)
+  const href = to || `/lugar/${encodeURIComponent(place.id)}`
 
   return (
-    <article className="card place-card">
+    <Link to={href} className="card place-card">
+      <img
+        className="place-thumb"
+        src={cardPhoto(place)}
+        alt=""
+        onError={(event) => {
+          event.currentTarget.onerror = null
+          event.currentTarget.src = categoryPhoto(place.type)
+        }}
+      />
       <div>
         <h4>{place.name}</h4>
         <div className="meta">
@@ -16,9 +28,16 @@ export default function PlaceCard({ place, extra }) {
       <div className="distance">
         {dist}
         {place.lat ? (
-          <a className="meta maps-link" href={mapsUrl(place)} target="_blank" rel="noreferrer">
+          <span
+            className="meta maps-link"
+            onClick={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
+              window.open(mapsUrl(place), '_blank', 'noopener,noreferrer')
+            }}
+          >
             Cómo llegar
-          </a>
+          </span>
         ) : null}
       </div>
       <div className="tags">
@@ -30,6 +49,6 @@ export default function PlaceCard({ place, extra }) {
         ))}
         {extra}
       </div>
-    </article>
+    </Link>
   )
 }

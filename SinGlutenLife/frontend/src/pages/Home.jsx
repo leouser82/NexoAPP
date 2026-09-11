@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
+import PlaceCard from '../components/PlaceCard.jsx'
 import { dailyMeals, recipes, user } from '../data/mock.js'
-import { formatDistance } from '../geo/geo.js'
 import { useLocationData } from '../geo/LocationContext.jsx'
 
 export default function Home() {
@@ -79,13 +79,7 @@ export default function Home() {
         <Link to="/lugares">Ver todas</Link>
       </div>
       {nearest ? (
-        <article className="card">
-          <h4 style={{ margin: '0 0 4px' }}>{nearest.name}</h4>
-          <p className="meta" style={{ margin: 0 }}>
-            {nearest.type} · {formatDistance(nearest.distanceKm)}
-            {nearest.address ? ` · ${nearest.address}` : ''}
-          </p>
-        </article>
+        <PlaceCard place={nearest} />
       ) : (
         <p className="note">
           {placesStatus === 'loading'
