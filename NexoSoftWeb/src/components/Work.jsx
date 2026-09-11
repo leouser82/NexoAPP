@@ -4,8 +4,8 @@ export default function Work() {
   return (
     <section id="trabajo" className="work">
       <div className="section-head">
-        <p className="kicker">Portafolio</p>
-        <h2>Piezas recientes. El resto, en una llamada.</h2>
+        <p className="kicker">Ejemplos reales</p>
+        <h2>Así se ve un sistema cuando está hecho para usarse.</h2>
       </div>
       <article className="case">
         <a className="case-visual" href={APP_URL}>
@@ -18,17 +18,17 @@ export default function Work() {
           <span className="case-open">Abrir app →</span>
         </a>
         <div className="case-copy">
-          <p className="tag">Producto · Salud · App web</p>
+          <p className="tag">Salud · App para el día a día</p>
           <h3>SinGluten Life</h3>
           <p>
-            Plataforma para personas celíacas: lugares seguros, farmacias, recetas y menú del
-            día. Estética cálida, clara y confiable — hecha para usarse todos los días, no para
-            impresionar un jury.
+            Una app para personas celíacas: dónde comer, farmacias, recetas y el menú del día.
+            Clara, cálida y fácil de usar — pensada para abrirla todos los días, no para
+            impresionar.
           </p>
           <ul>
-            <li>Producto de consumo diario</li>
-            <li>UI de app con mapa, recetas y discovery</li>
-            <li>Stack: React + visión de backend .NET</li>
+            <li>Encontrá lugares cerca, sin vueltas</li>
+            <li>Recetas y menú del día al alcance</li>
+            <li>Se ve y se siente como una app de verdad</li>
           </ul>
           <div className="case-actions">
             <a className="btn primary" href={APP_URL}>

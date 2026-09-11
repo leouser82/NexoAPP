@@ -4,8 +4,8 @@ export default function Services() {
   return (
     <section id="servicios" className="services">
       <div className="section-head">
-        <p className="kicker">Servicios</p>
-        <h2>Lo que contrato un estudio por el precio de un freelance.</h2>
+        <p className="kicker">Qué te llevás</p>
+        <h2>Un sistema web pensado para gente que tiene un negocio, no para programadores.</h2>
       </div>
       <div className="service-grid">
         {SERVICES.map((service) => (

@@ -6,11 +6,11 @@ export default function Header() {
         nexo<span>studio</span>
       </a>
       <nav>
-        <a href="#servicios">Servicios</a>
-        <a href="#trabajo">Trabajo</a>
-        <a href="#proceso">Método</a>
+        <a href="#servicios">Qué te llevás</a>
+        <a href="#trabajo">Ejemplos</a>
+        <a href="#proceso">Cómo va</a>
         <a href="#contacto" className="nav-cta">
-          Reservar llamada
+          Empezar
         </a>
       </nav>
     </header>

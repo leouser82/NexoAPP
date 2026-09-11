@@ -4,8 +4,8 @@ export default function Process() {
   return (
     <section id="proceso" className="process">
       <div className="section-head">
-        <p className="kicker">Método</p>
-        <h2>Rápido, nítido, sin teatro.</h2>
+        <p className="kicker">Cómo va el trabajo</p>
+        <h2>De tu primer mensaje a tu sitio en el aire.</h2>
       </div>
       <ol>
         {STEPS.map((step) => (

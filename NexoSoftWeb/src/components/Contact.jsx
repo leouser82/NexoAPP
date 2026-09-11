@@ -75,14 +75,14 @@ export default function Contact() {
   return (
     <section id="contacto" className="contact">
       <div>
-        <p className="kicker">Siguiente paso</p>
-        <h2>Contame qué estás construyendo.</h2>
+        <p className="kicker">Empezá acá</p>
+        <h2>Contame qué necesita tu negocio.</h2>
         <p>
-          Respondé en 24–48h. Si hay fit, armamos un alcance claro. Si no hay fit, te lo digo —
-          no vendo por vender.
+          Te respondemos en 24 a 48 horas, en criollo. Si podemos ayudarte, te armamos el
+          camino. Si no es para nosotros, te lo decimos.
         </p>
         <p className="slots">
-          Disponibilidad: <strong>2 cupos este mes</strong>
+          Hay lugar para <strong>2 proyectos este mes</strong>
         </p>
       </div>
       <form onSubmit={onSubmit} autoComplete="on">
@@ -110,7 +110,7 @@ export default function Contact() {
           />
         </label>
         <label>
-          Qué necesitás
+          Qué te gustaría tener
           <select name="need" value={form.need} onChange={onChange}>
             {NEED_OPTIONS.map((option) => (
               <option key={option}>{option}</option>
@@ -118,17 +118,17 @@ export default function Contact() {
           </select>
         </label>
         <label>
-          El proyecto en una frase
+          Contanos en una frase
           <textarea
             name="message"
             rows="4"
-            placeholder="Ej: landing para mi estudio de arquitectura"
+            placeholder="Ej: tengo un local y quiero que la gente me escriba por WhatsApp"
             value={form.message}
             onChange={onChange}
           />
         </label>
         <button className="btn primary" type="submit" disabled={sending}>
-          {sending ? 'Enviando…' : 'Enviar briefing'}
+          {sending ? 'Enviando…' : 'Quiero que me escriban'}
         </button>
         {status ? <p className="form-note">{status}</p> : null}
       </form>

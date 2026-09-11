@@ -5,21 +5,22 @@ export default function Hero() {
     <section className="hero">
       <div className="hero-grid">
         <div className="hero-copy">
-          <p className="kicker">Freelance · Producto digital · Remoto</p>
+          <p className="kicker">Sitios y sistemas · Hosting propio · Hecho con IA</p>
           <h1>
-            Marcas que se ven
-            <em>imposibles de ignorar.</em>
+            Tu negocio, online,
+            <em>fácil de entender.</em>
           </h1>
           <p className="lede">
-            Diseño y desarrollo para negocios que quieren verse premium y vender más. Landing,
-            web, apps y sistemas — con look de producto actual, no de plantilla.
+            Te armamos el sitio o el sistema que tu negocio necesita: se ve profesional, se
+            entiende al toque y queda publicado en nuestro hosting. Vos te ocupás de vender;
+            nosotros de que internet trabaje para vos.
           </p>
           <div className="hero-actions">
             <a className="btn primary" href="#contacto">
-              Quiero un proyecto
+              Quiero mi sitio
             </a>
-            <a className="btn ghost" href="#trabajo">
-              Ver portafolio
+            <a className="btn ghost" href="#proceso">
+              Cómo trabajamos
             </a>
           </div>
         </div>
