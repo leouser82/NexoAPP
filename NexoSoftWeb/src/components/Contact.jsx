@@ -7,7 +7,6 @@ const EMPTY_FORM = {
   email: '',
   need: NEED_OPTIONS[0],
   message: '',
-  company: '',
 }
 
 async function sendBriefing(fields) {
@@ -45,11 +44,6 @@ export default function Contact() {
 
   async function onSubmit(event) {
     event.preventDefault()
-    if (form.company) {
-      setStatus('Listo. Te escribo en 24–48h.')
-      return
-    }
-
     setSending(true)
     setStatus('Enviando…')
 
@@ -91,22 +85,13 @@ export default function Contact() {
           Disponibilidad: <strong>2 cupos este mes</strong>
         </p>
       </div>
-      <form onSubmit={onSubmit}>
-        <label className="hp" aria-hidden="true">
-          Empresa
-          <input
-            name="company"
-            tabIndex={-1}
-            autoComplete="off"
-            value={form.company}
-            onChange={onChange}
-          />
-        </label>
+      <form onSubmit={onSubmit} autoComplete="on">
         <label>
           Nombre
           <input
             name="name"
             required
+            autoComplete="name"
             placeholder="Tu nombre"
             value={form.name}
             onChange={onChange}
@@ -118,6 +103,7 @@ export default function Contact() {
             name="email"
             type="email"
             required
+            autoComplete="email"
             placeholder="hola@marca.com"
             value={form.email}
             onChange={onChange}

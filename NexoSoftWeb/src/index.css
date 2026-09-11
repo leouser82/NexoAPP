@@ -598,14 +598,6 @@ textarea {
   color: var(--accent);
 }
 
-.hp {
-  position: absolute;
-  left: -9999px;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-}
-
 button:disabled {
   opacity: 0.65;
   cursor: wait;

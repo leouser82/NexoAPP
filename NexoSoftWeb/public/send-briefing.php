@@ -27,12 +27,6 @@ $name = clean_header($data['name'] ?? '');
 $email = clean_header($data['email'] ?? '');
 $need = clean_header($data['need'] ?? '');
 $message = trim((string) ($data['message'] ?? ''));
-$honeypot = trim((string) ($data['company'] ?? ''));
-
-if ($honeypot !== '') {
-  echo json_encode(['ok' => true]);
-  exit;
-}
 
 if ($name === '' || $email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
   http_response_code(400);
