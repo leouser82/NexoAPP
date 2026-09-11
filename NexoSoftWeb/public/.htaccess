@@ -1,0 +1,6 @@
+RewriteEngine On
+
+RewriteRule ^singluten$ /singluten/ [R=302,L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^singluten/(.*)$ /singluten/index.html [L]
