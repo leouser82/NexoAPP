@@ -1,5 +1,9 @@
 import { Link } from 'react-router-dom'
 import PlaceCard from '../components/PlaceCard.jsx'
+import artComida from '../assets/comida-cerca.svg'
+import artFarmacias from '../assets/farmacias.svg'
+import artMenu from '../assets/menu-dia.svg'
+import artCocinar from '../assets/cocinar-casa.svg'
 import { dailyMeals, recipes, user } from '../data/mock.js'
 import { useLocationData } from '../geo/LocationContext.jsx'
 
@@ -36,8 +40,8 @@ export default function Home() {
         <h3>Empezá por acá</h3>
       </div>
       <div className="grid-2">
-        <Link className="quick-card" to="/lugares">
-          <span className="ico blue">🍽</span>
+        <Link className="quick-card photo-card" to="/lugares">
+          <img src={artComida} alt="" />
           <div>
             <h4>Comida cerca</h4>
             <span>
@@ -47,8 +51,8 @@ export default function Home() {
             </span>
           </div>
         </Link>
-        <Link className="quick-card" to="/farmacias">
-          <span className="ico sky">💊</span>
+        <Link className="quick-card photo-card" to="/farmacias">
+          <img src={artFarmacias} alt="" />
           <div>
             <h4>Farmacias</h4>
             <span>
@@ -58,15 +62,15 @@ export default function Home() {
             </span>
           </div>
         </Link>
-        <Link className="quick-card" to="/menu">
-          <span className="ico coral">☀</span>
+        <Link className="quick-card photo-card" to="/menu">
+          <img src={artMenu} alt="" />
           <div>
             <h4>Menú de hoy</h4>
             <span>${todayCost.toLocaleString('es-AR')} para las 4 comidas</span>
           </div>
         </Link>
-        <Link className="quick-card" to="/recetas">
-          <span className="ico navy">🥗</span>
+        <Link className="quick-card photo-card" to="/recetas">
+          <img src={artCocinar} alt="" />
           <div>
             <h4>Cocinar en casa</h4>
             <span>Recetas que entran en tu bolsillo</span>

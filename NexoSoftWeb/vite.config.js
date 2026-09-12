@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
+import { lookupPhoto, lookupPlace, peekPlace } from './placeInfo.js'
 import { build as viteBuild, createServer, defineConfig } from 'vite'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -59,6 +60,49 @@ function sglPreviewSpaFallback(req, res, next) {
   next()
 }
 
+function placeInfoEndpoint() {
+  return {
+    name: 'place-info-endpoint',
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        const pathName = (req.url || '').split('?')[0]
+        const isInfo = pathName === '/place-info.php' || pathName === '/api/place-info'
+        const isPhoto = pathName === '/api/place-photo'
+        const isGf = pathName === '/api/place-gf'
+        if (!isInfo && !isPhoto && !isGf) {
+          return next()
+        }
+        const url = new URL(req.url, 'http://127.0.0.1')
+        const query = {
+          name: url.searchParams.get('name') || '',
+          address: url.searchParams.get('address') || '',
+          lat: url.searchParams.get('lat'),
+          lon: url.searchParams.get('lon'),
+          type: url.searchParams.get('type') || '',
+          area: url.searchParams.get('area') || '',
+          website: url.searchParams.get('website') || '',
+        }
+        try {
+          let data
+          if (isGf) data = peekPlace(query)
+          else if (isPhoto) data = await lookupPhoto(query)
+          else data = await lookupPlace(query)
+          const payload = JSON.stringify(data)
+          res.writeHead(200, {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Cache-Control': 'public, max-age=180',
+          })
+          res.end(payload)
+        } catch (error) {
+          const payload = JSON.stringify({ ok: false, error: String(error.message || error) })
+          res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' })
+          res.end(payload)
+        }
+      })
+    },
+  }
+}
+
 function briefingDevEndpoint() {
   return {
     name: 'briefing-dev-endpoint',
@@ -93,6 +137,7 @@ function embedSinGlutenLife() {
           sglInlineConfig({
             server: {
               middlewareMode: true,
+              watch: { ignored: ['**/.cache/**'] },
               fs: { allow: [SGL_ROOT, __dirname] },
               hmr: {
                 server: nexo.httpServer,
@@ -144,11 +189,16 @@ function embedSinGlutenLife() {
 }
 
 export default defineConfig({
-  plugins: [react(), briefingDevEndpoint(), embedSinGlutenLife()],
+  plugins: [react(), briefingDevEndpoint(), placeInfoEndpoint(), embedSinGlutenLife()],
   server: {
     host: '127.0.0.1',
     port: 5180,
     strictPort: false,
+    // The scraper cache lives in the project folder; writing to it must not
+    // reload the browser.
+    watch: {
+      ignored: ['**/.cache/**'],
+    },
     fs: {
       allow: [__dirname, SGL_ROOT],
     },

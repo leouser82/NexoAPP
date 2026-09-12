@@ -28,15 +28,7 @@ export default function Farmacias() {
       />
       <div className="grid-cards">
         {list.map((p) => (
-          <PlaceCard
-            key={p.id}
-            place={p}
-            extra={(p.products || []).slice(0, 2).map((prod) => (
-              <span className="tag ok" key={prod}>
-                {prod}
-              </span>
-            ))}
-          />
+          <PlaceCard key={p.id} place={p} />
         ))}
       </div>
       {placesStatus === 'loading' && <p className="note">Cargando farmacias cercanas…</p>}

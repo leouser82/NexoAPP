@@ -97,6 +97,7 @@ function toPlace(el, origin) {
     lon: coords.lon,
     distanceKm: distanceKm(origin, coords),
     address: addressOf(tags),
+    city: [tags['addr:suburb'], tags['addr:city']].filter(Boolean).join(', '),
     hours: tags.opening_hours || '',
     tags: tagsList.slice(0, 3),
     certified,
@@ -108,9 +109,10 @@ function toPlace(el, origin) {
     image: tags.image || tags['image:url'] || '',
     wikidata: tags.wikidata || '',
     wikipedia: tags.wikipedia || '',
+    wikimedia: tags.wikimedia_commons || '',
     osmType: el.type || 'node',
     osmId: el.id,
-    products: kind.category === 'farmacia' ? ['Alimentos sin TACC', 'Premezclas', 'Snacks'] : [],
+    products: [],
   }
 }
 
@@ -191,10 +193,11 @@ function photonToPlace(feature, origin) {
     lon,
     distanceKm: distanceKm(origin, { lat, lon }),
     address: [props.street, props.housenumber, props.city].filter(Boolean).join(' '),
+    city: [props.district, props.city].filter(Boolean).join(', '),
     hours: '',
     tags: certified ? [] : ['Cerca'],
     certified,
-    products: kind.category === 'farmacia' ? ['Alimentos sin TACC'] : [],
+    products: [],
     website: props.website || '',
     menuUrl: '',
     cuisine: props.osm_value === 'restaurant' ? '' : '',
@@ -202,6 +205,7 @@ function photonToPlace(feature, origin) {
     image: '',
     wikidata: '',
     wikipedia: '',
+    wikimedia: '',
     osmType: ({ N: 'node', W: 'way', R: 'relation' }[props.osm_type] || '').toLowerCase() || (props.osm_type || ''),
     osmId: props.osm_id || '',
   }

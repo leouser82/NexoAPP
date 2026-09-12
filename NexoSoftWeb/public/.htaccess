@@ -1,5 +1,6 @@
 RewriteEngine On
 
+RewriteRule ^api/place-info$ /place-info.php [L,QSA]
 RewriteRule ^singluten$ /singluten/ [R=302,L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
