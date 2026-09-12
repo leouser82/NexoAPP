@@ -43,27 +43,6 @@ async function fetchJson(url, ms = 8000) {
   }
 }
 
-/** Background warm-up gets its own lane so it never delays visible photos. */
-const background = { queue: [], active: 0, limit: 2 }
-
-function withPool(pool, task) {
-  return new Promise((resolve, reject) => {
-    const run = async () => {
-      pool.active += 1
-      try {
-        resolve(await task())
-      } catch (error) {
-        reject(error)
-      } finally {
-        pool.active -= 1
-        pool.queue.shift()?.()
-      }
-    }
-    if (pool.active >= pool.limit) pool.queue.push(run)
-    else run()
-  })
-}
-
 function withSlot(task) {
   return new Promise((resolve, reject) => {
     const run = async () => {
@@ -174,10 +153,12 @@ function uniquePhotos(urls) {
 function buildAbout(place, tags, hours) {
   if (tags.description) return tags.description
   if (place.description) return place.description
-  const bits = [place.type]
+  const bits = [place.type.toLowerCase()]
   if (tags.cuisine || place.cuisine) bits.push(`cocina ${(tags.cuisine || place.cuisine).replace(/;/g, ', ')}`)
-  if (place.certified || ['yes', 'only'].includes(String(tags['diet:gluten_free'] || '').toLowerCase())) {
-    bits.push('con opción o sello sin TACC en OpenStreetMap')
+  if (place.level === 'dedicado') bits.push('publicado como 100% libre de gluten')
+  else if (place.level === 'opciones') bits.push('publicado con opciones sin TACC')
+  else if (['yes', 'only'].includes(String(tags['diet:gluten_free'] || '').toLowerCase())) {
+    bits.push('con opción sin TACC en OpenStreetMap')
   }
   if (hours.openLabel) bits.push(hours.openLabel.toLowerCase())
   if (place.address) bits.push(`en ${place.address}`)
@@ -211,35 +192,21 @@ export async function loadCardPhoto(place, area = '') {
   })
 }
 
-/**
- * What the scraper already knows about this place, read straight from the
- * cache: no request goes out, so the whole list can ask at once.
- */
-export async function peekGlutenState(place, area = '') {
-  try {
-    const data = await fetchJson(`/api/place-gf?${placeParams(place, area)}`, 6000)
-    return data || { known: false, gfState: 'desconocido' }
-  } catch {
-    return { known: false, gfState: 'desconocido' }
-  }
-}
-
-/** Full lookup for a card: warms the cache and reports the sin TACC state. */
-export async function loadGlutenState(place, area = '') {
-  return withPool(background, async () => {
-    try {
-      const data = await fetchJson(`/api/place-info?${placeParams(place, area)}`, 40000)
-      if (data?.photos?.[0]) photoCache.set(`${place.name}|${place.lat}|${place.lon}`, data.photos[0])
-      return data || {}
-    } catch {
-      return {}
-    }
-  })
-}
-
 async function fetchLivePlace(place, area) {
   const data = await fetchJson(`/api/place-info?${placeParams(place, area)}`, 30000)
   return data || {}
+}
+
+/** The guide entry is itself the sin TACC evidence, with its own link. */
+function guideMention(place) {
+  if (!place.level) return []
+  const guides = place.guides?.length ? place.guides : ['La guía']
+  const verb = guides.length > 1 ? 'lo publican' : 'lo publica'
+  const text =
+    place.level === 'dedicado'
+      ? `${guides.join(' y ')} ${verb} como local 100% libre de gluten. No es una certificación: confirmá el protocolo y la contaminación cruzada en el local.`
+      : `${guides.join(' y ')} ${verb} con opciones sin TACC. Confirmá en el local cómo manejan la contaminación cruzada.`
+  return [{ text, source: place.guideUrl || 'https://www.celimap.com.ar/mapa' }]
 }
 
 function assembleDetails(place, tags, wikiData, photos, live = {}) {
@@ -262,10 +229,23 @@ function assembleDetails(place, tags, wikiData, photos, live = {}) {
     hoursRaw: tags.opening_hours || place.hours || '',
     hours,
     cuisine: tags.cuisine || place.cuisine || '',
-    gfOfficial: ['yes', 'only', 'limited'].includes(String(tags['diet:gluten_free'] || '').toLowerCase()),
+    gfOfficial:
+      place.level === 'dedicado' ||
+      ['yes', 'only', 'limited'].includes(String(tags['diet:gluten_free'] || '').toLowerCase()),
+    level: place.level || '',
+    guides: place.guides || [],
+    guideUrl: place.guideUrl || '',
+    guideFacts: [
+      ['Cocina', place.kitchen],
+      ['Materia prima', place.supply],
+      ['Modalidad', place.mode],
+      ['Cuidados', place.care],
+    ]
+      .filter(([, value]) => value)
+      .map(([label, value]) => ({ label, value })),
     menu: live.menu || [],
-    gfMentions: live.gfMentions || [],
-    gfState: live.gfState || 'desconocido',
+    gfMentions: [...guideMention(place), ...(live.gfMentions || [])].slice(0, 4),
+    gfState: place.level ? 'confirmado' : live.gfState || 'desconocido',
     reviews: live.reviews || [],
     rating: live.rating || null,
     reviewCount: live.reviewCount || null,
@@ -283,12 +263,15 @@ export async function loadPlaceDetails(place, areaLabel = '', onUpdate) {
     return cached
   }
 
-  // Phase 1: free sources, so the page renders something immediately.
+  // What the guide already gave us: photos, hours and level, with no waiting.
+  onUpdate?.(assembleDetails(place, {}, {}, uniquePhotos([...(place.photos || []), place.image])))
+
+  // Phase 1: free sources, to fill in what the guide does not carry.
   const [osm, wiki] = await Promise.allSettled([fetchOsmTags(place), fetchWikiAbout(place, areaLabel)])
   const tags = osm.status === 'fulfilled' ? osm.value : {}
   const wikiData = wiki.status === 'fulfilled' ? wiki.value : {}
 
-  const basePhotos = uniquePhotos([place.image, tags.image, tags['image:url']])
+  const basePhotos = uniquePhotos([...(place.photos || []), place.image, tags.image, tags['image:url']])
   onUpdate?.(assembleDetails(place, tags, wikiData, basePhotos))
 
   // Phase 2: the scraper (photos, rating, opinions, hours, menu).
@@ -299,7 +282,8 @@ export async function loadPlaceDetails(place, areaLabel = '', onUpdate) {
   const liveData = live.status === 'fulfilled' ? live.value : {}
   const commonsList = commons.status === 'fulfilled' ? commons.value : []
 
-  const photos = uniquePhotos([...(liveData.photos || []), ...basePhotos, ...commonsList])
+  // The guide's own photos go first: they are the ones tied to this place.
+  const photos = uniquePhotos([...basePhotos, ...(liveData.photos || []), ...commonsList])
   if (photos[0]) photoCache.set(`${place.name}|${place.lat}|${place.lon}`, photos[0])
 
   const details = assembleDetails(place, tags, wikiData, photos, liveData)

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { formatDistance, mapsUrl } from '../geo/geo.js'
+import { hoursLines } from '../geo/guideHours.js'
 import { getCachedPlace } from '../geo/placeCache.js'
 import { formatArs, loadPlaceDetails } from '../geo/placeDetails.js'
 import { useLocationData } from '../geo/LocationContext.jsx'
@@ -84,10 +85,10 @@ export default function PlaceDetalle() {
       {place.address ? <p className="note" style={{ marginTop: 0 }}>{place.address}</p> : null}
 
       <div className="tags" style={{ marginBottom: 14 }}>
-        {gfConfirmed ? (
-          <span className="tag ok">Sin TACC</span>
-        ) : gfMentions.length ? (
-          <span className="tag ok">Sin TACC publicado</span>
+        {place.level === 'dedicado' || gfConfirmed ? (
+          <span className="tag ok">100% sin gluten</span>
+        ) : place.level === 'opciones' || gfMentions.length ? (
+          <span className="tag ok">Opciones sin TACC</span>
         ) : (
           <span className="tag warn">Sin TACC sin confirmar</span>
         )}
@@ -164,6 +165,16 @@ export default function PlaceDetalle() {
         <section className="card place-block">
           <h3>Sobre el lugar</h3>
           <p>{details?.about || `${place.name} es una ${place.type.toLowerCase()}${place.address ? ` en ${place.address}` : ''}.`}</p>
+          {details?.guideFacts?.length ? (
+            <dl className="guide-facts">
+              {details.guideFacts.map((fact) => (
+                <div key={fact.label}>
+                  <dt>{fact.label}</dt>
+                  <dd>{fact.value}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
           {details?.phone ? <p className="note">Tel: {details.phone}</p> : null}
           {features.length ? (
             <ul className="feature-list">
@@ -230,6 +241,14 @@ export default function PlaceDetalle() {
                 </li>
               ))}
             </ul>
+          ) : hoursLines(details?.hoursRaw).length ? (
+            <ul className="hours-list plain">
+              {hoursLines(details.hoursRaw).map((line) => (
+                <li key={line}>
+                  <span>{line}</span>
+                </li>
+              ))}
+            </ul>
           ) : hours.openLabel ? (
             <p>{hours.openLabel}</p>
           ) : (
@@ -258,7 +277,15 @@ export default function PlaceDetalle() {
         ) : (
           <p className="note">Todavía no hay reseñas públicas para mostrar. Podés ver más en Google.</p>
         )}
-        {details?.sources?.length ? (
+        {details?.guideUrl ? (
+            <p className="note" style={{ marginTop: 10 }}>
+              Figura en{' '}
+              <a className="maps-link" href={details.guideUrl} target="_blank" rel="noreferrer">
+                {(details.guides || []).join(' y ') || 'la guía sin TACC'}
+              </a>
+            </p>
+          ) : null}
+          {details?.sources?.length ? (
           <p className="note" style={{ marginTop: 10 }}>
             Datos públicos de {details.sources.map((url) => new URL(url).hostname.replace(/^www\./, '')).join(', ')}
           </p>

@@ -1,14 +1,12 @@
 import { useMemo, useState } from 'react'
 import PlaceCard from '../components/PlaceCard.jsx'
 import { useLocationData } from '../geo/LocationContext.jsx'
-import { GF_OK, useGlutenScan } from '../geo/useGlutenScan.js'
 
 export default function Lugares() {
   const { places, placesStatus, label, locate, source, status, error } = useLocationData()
   const [q, setQ] = useState('')
   const [filter, setFilter] = useState('Todos')
-  const [onlyGf, setOnlyGf] = useState(false)
-  const { states, pending } = useGlutenScan(places, label, onlyGf)
+  const [onlyDedicated, setOnlyDedicated] = useState(false)
 
   const filters = useMemo(() => {
     const types = [...new Set(places.map((p) => p.type))]
@@ -18,17 +16,20 @@ export default function Lugares() {
   const list = useMemo(() => {
     return places.filter((p) => {
       const byType = filter === 'Todos' || p.type === filter
-      const text = `${p.name} ${p.address || ''} ${(p.tags || []).join(' ')}`.toLowerCase()
-      const byGf = !onlyGf || GF_OK.has(states[p.id])
-      return byType && byGf && text.includes(q.toLowerCase())
+      const byLevel = !onlyDedicated || p.level === 'dedicado'
+      const text = `${p.name} ${p.address || ''} ${p.city || ''} ${(p.tags || []).join(' ')}`.toLowerCase()
+      return byType && byLevel && text.includes(q.toLowerCase())
     })
-  }, [places, q, filter, onlyGf, states])
+  }, [places, q, filter, onlyDedicated])
+
+  const dedicated = useMemo(() => places.filter((p) => p.level === 'dedicado').length, [places])
+  const guides = useMemo(() => [...new Set(places.flatMap((p) => p.guides || []))], [places])
 
   return (
     <main className="page">
       <div className="banner-proto">
         {status === 'locating' || placesStatus === 'loading'
-          ? `Buscando lugares reales cerca de ${label}…`
+          ? `Buscando lugares sin TACC cerca de ${label}…`
           : source === 'gps'
             ? `Ubicación real · ${label}. Distancia medida en línea recta.`
             : source === 'ip'
@@ -37,12 +38,13 @@ export default function Lugares() {
       </div>
       <h2 className="page-title">¿Dónde comemos hoy?</h2>
       <p className="note" style={{ margin: '0 0 14px' }}>
-        Panaderías, confiterías y dietéticas a 5 km. Restaurantes, los más cercanos hasta 50 km.
-        Son locales de comida cerca tuyo: solo los que dicen “Sin TACC” tienen el dato publicado.
+        {places.length
+          ? `${places.length} lugares sin TACC a menos de 25 km, ${dedicated} con cocina 100% libre de gluten. Datos de ${guides.join(', ')}. Confirmá siempre el protocolo en el local.`
+          : 'Solo mostramos lugares que figuran en guías sin TACC. Ninguna etiqueta reemplaza preguntar en el local.'}
       </p>
       <input
         className="search"
-        placeholder="Panadería, pizza, dietética…"
+        placeholder="Buscar por nombre, barrio o dirección…"
         value={q}
         onChange={(e) => setQ(e.target.value)}
       />
@@ -53,25 +55,18 @@ export default function Lugares() {
           </button>
         ))}
         <button
-          className={`filter gf ${onlyGf ? 'active' : ''}`}
-          onClick={() => setOnlyGf((value) => !value)}
+          className={`filter gf ${onlyDedicated ? 'active' : ''}`}
+          onClick={() => setOnlyDedicated((value) => !value)}
         >
-          Sin TACC confirmado
+          Solo 100% sin gluten
         </button>
       </div>
-      {onlyGf ? (
-        <p className="note" style={{ margin: '0 0 10px' }}>
-          {pending
-            ? `Revisando qué publica cada local… faltan ${pending}. Los resultados se van sumando.`
-            : 'Estos son los locales donde encontramos el dato publicado, con su fuente en la ficha.'}
-        </p>
-      ) : null}
       <div className="grid-cards">
         {list.map((p) => (
-          <PlaceCard key={p.id} place={p} gfState={states[p.id]} />
+          <PlaceCard key={p.id} place={p} />
         ))}
       </div>
-      {placesStatus === 'loading' && <p className="note">Cargando mapa de locales…</p>}
+      {placesStatus === 'loading' && <p className="note">Cargando guías sin TACC…</p>}
       {placesStatus === 'ready' && list.length === 0 && (
         <p className="note">
           No hay resultados con ese filtro.{' '}

@@ -21,12 +21,12 @@ function fileFor(key) {
   return path.join(CACHE_DIR, `${hash}.json`)
 }
 
-export function readCache(key) {
+export function readCache(key, ttlMs = TTL_MS) {
   if (memory.has(key)) return memory.get(key)
   try {
     const file = fileFor(key)
     const stat = fs.statSync(file)
-    if (Date.now() - stat.mtimeMs > TTL_MS) return null
+    if (Date.now() - stat.mtimeMs > ttlMs) return null
     const data = JSON.parse(fs.readFileSync(file, 'utf8'))
     memory.set(key, data)
     return data

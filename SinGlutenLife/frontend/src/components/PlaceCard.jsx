@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatDistance, mapsUrl } from '../geo/geo.js'
+import { todayLine } from '../geo/guideHours.js'
 import { loadCardPhoto } from '../geo/placeDetails.js'
 import { useLocationData } from '../geo/LocationContext.jsx'
 
@@ -47,13 +48,13 @@ function PlaceThumb({ place }) {
   return <img className="place-thumb" ref={holder} src={src} alt="" loading="lazy" onError={() => setSrc('')} />
 }
 
-function GlutenTag({ place, gfState }) {
-  if (place.certified || gfState === 'confirmado') return <span className="tag ok">Sin TACC</span>
-  if (gfState === 'mencionado') return <span className="tag ok">Sin TACC publicado</span>
-  return <span className="tag warn">Sin confirmar</span>
+function GlutenTag({ place }) {
+  if (place.level === 'dedicado') return <span className="tag ok">100% sin gluten</span>
+  if (place.level === 'opciones') return <span className="tag ok">Opciones sin TACC</span>
+  return null
 }
 
-export default function PlaceCard({ place, extra, to, gfState }) {
+export default function PlaceCard({ place, extra, to }) {
   const dist = formatDistance(place.distanceKm)
   const href = to || `/lugar/${encodeURIComponent(place.id)}`
 
@@ -66,7 +67,7 @@ export default function PlaceCard({ place, extra, to, gfState }) {
           {place.type}
           {place.address ? ` · ${place.address}` : ''}
         </div>
-        {place.hours ? <div className="meta">{place.hours}</div> : null}
+        {todayLine(place.hours) ? <div className="meta">{todayLine(place.hours)}</div> : null}
       </div>
       <div className="distance">
         {dist}
@@ -84,15 +85,9 @@ export default function PlaceCard({ place, extra, to, gfState }) {
         ) : null}
       </div>
       <div className="tags">
-        <GlutenTag place={place} gfState={gfState} />
-        {(place.tags || [])
-          .filter((t) => t !== 'Cerca' && t !== 'A confirmar')
-          .slice(0, 2)
-          .map((t) => (
-            <span className="tag" key={t}>
-              {t}
-            </span>
-          ))}
+        <GlutenTag place={place} />
+        {/mixta/i.test(place.kitchen || '') ? <span className="tag">Cocina mixta</span> : null}
+        {(place.guides || []).length > 1 ? <span className="tag">En {place.guides.length} guías</span> : null}
         {extra}
       </div>
     </Link>

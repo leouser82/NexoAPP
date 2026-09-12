@@ -1,6 +1,6 @@
-import { fetchPage, postForm } from './scraper/http.js'
+import { fetchPage } from './scraper/http.js'
+import { overpass } from './scraper/overpass.js'
 import { crawlGluten, crawlPlace } from './scraper/crawl.js'
-import { glutenDirectory } from './scraper/glutenIndex.js'
 import {
   distinctiveTokens,
   extractJsonLd,
@@ -42,8 +42,8 @@ function unique(list) {
 async function osmTags(lat, lon, name) {
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return {}
   const query = `[out:json][timeout:10];(node(around:120,${lat},${lon})["name"];way(around:120,${lat},${lon})["name"];);out tags center;`
-  const data = await postForm('https://overpass-api.de/api/interpreter', { data: query })
-  const elements = data?.elements || []
+  const data = await overpass(query, { timeoutMs: 14000 })
+  const elements = data.elements || []
   if (!elements.length) return {}
 
   // Only trust an element whose name matches: the nearest node could be the
@@ -107,10 +107,9 @@ export async function lookupPlace({ name = '', address = '', area = '', lat, lon
     const searchable = distinctiveTokens(name).length > 0 || /\b\d{2,5}\b/.test(address)
 
     // Independent sources, so they run together instead of one after another.
-    const [crawled, tags, directory] = await Promise.all([
+    const [crawled, tags] = await Promise.all([
       searchable ? crawlPlace({ name, address, area, type }).catch(() => ({})) : Promise.resolve({}),
       osmTags(Number(lat), Number(lon), name).catch(() => ({})),
-      glutenDirectory({ name, address, area }).catch(() => null),
     ])
 
     Object.assign(data, {
@@ -158,9 +157,6 @@ export async function lookupPlace({ name = '', address = '', area = '', lat, lon
       if (!data.gfMentions.length) data.gfMentions = site.gfMentions
     }
 
-    // The local gluten-free directory is the best source, so it goes first.
-    if (directory) data.gfMentions = [directory.mention, ...data.gfMentions].slice(0, 4)
-
     if (!data.gfMentions.length) {
       data.gfMentions = await crawlGluten({ name, area, address }).catch(() => [])
     }
@@ -179,8 +175,6 @@ export async function lookupPlace({ name = '', address = '', area = '', lat, lon
         },
         ...data.gfMentions,
       ].slice(0, 4)
-    } else if (directory) {
-      data.gfState = directory.state
     } else if (data.gfMentions.length) {
       data.gfState = 'mencionado'
     } else {
@@ -191,22 +185,6 @@ export async function lookupPlace({ name = '', address = '', area = '', lat, lon
     writeCache(key, data)
     return data
   })
-}
-
-/**
- * Cache-only read for the list: tells the cards what is already known about
- * gluten-free handling without firing a single request.
- */
-export function peekPlace({ name = '', address = '', lat }) {
-  const cached = readCache(cacheKey(name, address, lat))
-  if (!cached) return { known: false, gfState: 'desconocido', gfMentions: [] }
-  return {
-    known: true,
-    gfState: cached.gfState || 'desconocido',
-    gfMentions: cached.gfMentions || [],
-    photo: cached.photos?.[0] || '',
-    rating: cached.rating ?? null,
-  }
 }
 
 /** Cheap path for list cards: one photo, no deep crawl unless nothing else works. */
