@@ -16,21 +16,55 @@ const REFILL_MS = 900
 const buckets = new Map()
 
 // Global in-flight cap so a burst of cards cannot open dozens of sockets.
-const MAX_PARALLEL = 4
+const MAX_PARALLEL = 6
 let inFlight = 0
 const waiting = []
 
 const cookieJar = new Map()
 
+// Per host: when we last called it, and how many times it refused in a row.
+const hosts = new Map()
+const MIN_GAP_MS = 700
+const BLOCK_AFTER = 2
+const BLOCK_MS = 10 * 60 * 1000
+
 function jitter(min, max) {
   return min + Math.random() * (max - min)
 }
 
-/** Poisson-ish pause so the request rhythm is not perfectly regular. */
-function humanPause() {
+function hostState(host) {
+  let state = hosts.get(host)
+  if (!state) {
+    state = { lastAt: 0, failures: 0, blockedUntil: 0 }
+    hosts.set(host, state)
+  }
+  return state
+}
+
+/**
+ * A host that keeps answering 403/503 is not going to change its mind in the
+ * next few minutes, and insisting is what made a lookup take over a minute.
+ */
+function isBlocked(host) {
+  return hostState(host).blockedUntil > Date.now()
+}
+
+function noteRefusal(host) {
+  const state = hostState(host)
+  state.failures += 1
+  if (state.failures >= BLOCK_AFTER) state.blockedUntil = Date.now() + BLOCK_MS
+}
+
+/**
+ * Poisson-ish pause so the rhythm is not perfectly regular. It only applies
+ * when we just talked to this same host: a first visit needs no warm-up.
+ */
+function humanPause(host) {
+  const since = Date.now() - hostState(host).lastAt
+  if (since > MIN_GAP_MS * 3) return 0
   const mean = 420
   const value = -Math.log(1 - Math.random()) * mean
-  return Math.min(2200, Math.max(120, value))
+  return Math.min(1600, Math.max(MIN_GAP_MS - since, value))
 }
 
 function sleep(ms) {
@@ -120,11 +154,14 @@ export async function fetchPage(url, { timeoutMs = 12000, retries = 2, referer =
     const cached = readPage(url)
     if (cached) return cached
   }
+  if (isBlocked(host)) return ''
 
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     await takeToken(host)
     await acquireSlot()
-    await sleep(humanPause())
+    const pause = humanPause(host)
+    if (pause) await sleep(pause)
+    hostState(host).lastAt = Date.now()
 
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), timeoutMs)
@@ -137,17 +174,23 @@ export async function fetchPage(url, { timeoutMs = 12000, retries = 2, referer =
       rememberCookies(url, response)
 
       if (response.status === 429 || response.status === 503) {
+        noteRefusal(host)
         throw new Error(`throttled-${response.status}`)
+      }
+      if (response.status === 403 || response.status === 401) {
+        noteRefusal(host)
+        return ''
       }
       if (!response.ok) return ''
 
       const type = response.headers.get('content-type') || ''
       if (!/html|json|text/i.test(type)) return ''
       const body = await response.text()
+      hostState(host).failures = 0
       writePage(url, body)
       return body
     } catch {
-      if (attempt === retries) return ''
+      if (attempt === retries || isBlocked(host)) return ''
       // Exponential backoff with jitter before retrying.
       await sleep(700 * 2 ** attempt + jitter(0, 500))
     } finally {
@@ -170,6 +213,7 @@ export async function fetchJson(url, options = {}) {
 
 export async function postForm(url, body, { timeoutMs = 12000 } = {}) {
   const host = new URL(url).host
+  if (isBlocked(host)) return null
   await takeToken(host)
   await acquireSlot()
   const controller = new AbortController()
@@ -184,7 +228,11 @@ export async function postForm(url, body, { timeoutMs = 12000 } = {}) {
       },
       body: new URLSearchParams(body),
     })
-    if (!response.ok) return null
+    if (!response.ok) {
+      if ([401, 403, 429, 503].includes(response.status)) noteRefusal(host)
+      return null
+    }
+    hostState(host).failures = 0
     return await response.json()
   } catch {
     return null

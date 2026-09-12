@@ -106,9 +106,11 @@ export async function lookupPlace({ name = '', address = '', area = '', lat, lon
     // Either the name identifies the place, or the address carries a street number.
     const searchable = distinctiveTokens(name).length > 0 || /\b\d{2,5}\b/.test(address)
 
-    const [crawled, tags] = await Promise.all([
+    // Independent sources, so they run together instead of one after another.
+    const [crawled, tags, directory] = await Promise.all([
       searchable ? crawlPlace({ name, address, area, type }).catch(() => ({})) : Promise.resolve({}),
       osmTags(Number(lat), Number(lon), name).catch(() => ({})),
+      glutenDirectory({ name, address, area }).catch(() => null),
     ])
 
     Object.assign(data, {
@@ -157,7 +159,6 @@ export async function lookupPlace({ name = '', address = '', area = '', lat, lon
     }
 
     // The local gluten-free directory is the best source, so it goes first.
-    const directory = await glutenDirectory({ name, address, area }).catch(() => null)
     if (directory) data.gfMentions = [directory.mention, ...data.gfMentions].slice(0, 4)
 
     if (!data.gfMentions.length) {

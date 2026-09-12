@@ -371,45 +371,58 @@ export async function crawlPlace({ name, address, area = '', type = '', maxPages
 
   while (fetched < maxPages) {
     if (!frontier.length && !expand()) break
-    const next = frontier.shift()
-    if (!next) continue
-    const { url, depth } = next
 
-    const html = await fetchPage(url, { referer: depth === 0 ? '' : 'https://duckduckgo.com/' })
-    if (!html) continue
-
-    if (depth === 0) {
-      const candidates = linksFrom(html, url)
-        .map((candidate) => ({ ...candidate, rank: rank(candidate, nameTokens) }))
-        .filter((candidate) => candidate.rank > 0)
-        .sort((a, b) => b.rank - a.rank)
-
-      for (const candidate of candidates.slice(0, 4)) {
-        if (filter.seen(candidate.url)) continue
-        filter.add(candidate.url)
-        frontier.push({ url: candidate.url, depth: 1 })
-      }
-      continue
+    // Candidate pages live on different hosts, so the level is downloaded in
+    // one go. Search pages stay one at a time: the plan is consumed lazily.
+    const depth = frontier[0].depth
+    const width = depth === 0 ? 1 : Math.min(3, maxPages - fetched)
+    const batch = []
+    while (frontier.length && frontier[0].depth === depth && batch.length < width) {
+      batch.push(frontier.shift())
     }
 
-    fetched += 1
-    const record = parsePage(html, url, { name, address, area })
-    if (record) {
-      records.push(record)
-      const done = record.hoursRows.length && record.rating != null && record.reviews.length
-      if (done) break
-    } else if (depth === 1) {
-      // Listing page: follow the anchor that names this place (depth-first drill down).
-      const deeper = linksFrom(html, url)
-        .map((candidate) => ({ ...candidate, rank: rank(candidate, nameTokens) }))
-        .filter((candidate) => candidate.rank >= 2)
-        .sort((a, b) => b.rank - a.rank)
-      for (const candidate of deeper.slice(0, 2)) {
-        if (filter.seen(candidate.url)) continue
-        filter.add(candidate.url)
-        frontier.push({ url: candidate.url, depth: 2 })
+    const pages = await Promise.all(
+      batch.map((item) => fetchPage(item.url, { referer: item.depth === 0 ? '' : 'https://duckduckgo.com/' })),
+    )
+
+    let complete = false
+    for (const [index, item] of batch.entries()) {
+      const html = pages[index]
+      if (!html) continue
+
+      if (item.depth === 0) {
+        const candidates = linksFrom(html, item.url)
+          .map((candidate) => ({ ...candidate, rank: rank(candidate, nameTokens) }))
+          .filter((candidate) => candidate.rank > 0)
+          .sort((a, b) => b.rank - a.rank)
+
+        for (const candidate of candidates.slice(0, 4)) {
+          if (filter.seen(candidate.url)) continue
+          filter.add(candidate.url)
+          frontier.push({ url: candidate.url, depth: 1 })
+        }
+        continue
+      }
+
+      fetched += 1
+      const record = parsePage(html, item.url, { name, address, area })
+      if (record) {
+        records.push(record)
+        if (record.hoursRows.length && record.rating != null && record.reviews.length) complete = true
+      } else if (item.depth === 1) {
+        // Listing page: follow the anchor that names this place (depth-first drill down).
+        const deeper = linksFrom(html, item.url)
+          .map((candidate) => ({ ...candidate, rank: rank(candidate, nameTokens) }))
+          .filter((candidate) => candidate.rank >= 2)
+          .sort((a, b) => b.rank - a.rank)
+        for (const candidate of deeper.slice(0, 2)) {
+          if (filter.seen(candidate.url)) continue
+          filter.add(candidate.url)
+          frontier.push({ url: candidate.url, depth: 2 })
+        }
       }
     }
+    if (complete) break
   }
 
   return mergeRecords(records)

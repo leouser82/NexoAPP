@@ -119,19 +119,27 @@ async function loadIndex({ slug, barrio }) {
   const cached = readCache(key)
   if (cached) return cached
 
+  const pageUrl = (page) => {
+    const query = [barrio ? `barrio=${encodeURIComponent(barrio)}` : '', page > 1 ? `page=${page}` : '']
+      .filter(Boolean)
+      .join('&')
+    return `${BASE}/sin-gluten/${slug}${query ? `?${query}` : ''}`
+  }
+
   return dedupe(key, async () => {
-    const entries = []
-    for (let page = 1; page <= MAX_PAGES; page += 1) {
-      const query = [barrio ? `barrio=${encodeURIComponent(barrio)}` : '', page > 1 ? `page=${page}` : '']
-        .filter(Boolean)
-        .join('&')
-      const url = `${BASE}/sin-gluten/${slug}${query ? `?${query}` : ''}`
-      const html = await fetchPage(url, { timeoutMs: 14000, retries: 1 })
-      if (!html) break
-      const items = parseListing(html)
-      if (!items.length) break
-      entries.push(...items)
-      if (items.length < 10) break
+    const first = await fetchPage(pageUrl(1), { timeoutMs: 14000, retries: 1 })
+    const entries = first ? parseListing(first) : []
+    if (entries.length >= 10) {
+      // The listing is paginated ten by ten; one host, so the bucket paces it.
+      const rest = await Promise.all(
+        Array.from({ length: MAX_PAGES - 1 }, (_, index) =>
+          fetchPage(pageUrl(index + 2), { timeoutMs: 14000, retries: 1 }),
+        ),
+      )
+      for (const html of rest) {
+        if (!html) continue
+        entries.push(...parseListing(html))
+      }
     }
     const index = { slug, barrio, entries }
     writeCache(key, index)

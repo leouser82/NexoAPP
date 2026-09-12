@@ -43,6 +43,27 @@ async function fetchJson(url, ms = 8000) {
   }
 }
 
+/** Background warm-up gets its own lane so it never delays visible photos. */
+const background = { queue: [], active: 0, limit: 2 }
+
+function withPool(pool, task) {
+  return new Promise((resolve, reject) => {
+    const run = async () => {
+      pool.active += 1
+      try {
+        resolve(await task())
+      } catch (error) {
+        reject(error)
+      } finally {
+        pool.active -= 1
+        pool.queue.shift()?.()
+      }
+    }
+    if (pool.active >= pool.limit) pool.queue.push(run)
+    else run()
+  })
+}
+
 function withSlot(task) {
   return new Promise((resolve, reject) => {
     const run = async () => {
@@ -203,9 +224,9 @@ export async function peekGlutenState(place, area = '') {
   }
 }
 
-/** Full lookup for a card, used when the user asks to check sin TACC. */
+/** Full lookup for a card: warms the cache and reports the sin TACC state. */
 export async function loadGlutenState(place, area = '') {
-  return withSlot(async () => {
+  return withPool(background, async () => {
     try {
       const data = await fetchJson(`/api/place-info?${placeParams(place, area)}`, 40000)
       if (data?.photos?.[0]) photoCache.set(`${place.name}|${place.lat}|${place.lon}`, data.photos[0])
