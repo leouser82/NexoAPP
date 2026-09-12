@@ -1,16 +1,19 @@
+import { NAV, SITE } from '../content'
+
 export default function Header() {
   return (
     <header className="nav">
       <a className="logo" href="#top">
         <img src="/assets/favicon.png" alt="" width="36" height="36" />
         nexo<span>studio</span>
+        <span className="sr-only">{SITE.name}</span>
       </a>
-      <nav>
-        <a href="#servicios">Qué te llevás</a>
-        <a href="#trabajo">Ejemplos</a>
-        <a href="#proceso">Cómo va</a>
+      <nav aria-label={SITE.name}>
+        <a href="#servicios">{NAV.services}</a>
+        <a href="#trabajo">{NAV.work}</a>
+        <a href="#proceso">{NAV.process}</a>
         <a href="#contacto" className="nav-cta">
-          Empezar
+          {NAV.start}
         </a>
       </nav>
     </header>

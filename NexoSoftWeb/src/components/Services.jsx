@@ -1,11 +1,11 @@
-import { SERVICES } from '../content'
+import { SERVICES, SERVICES_INTRO } from '../content'
 
 export default function Services() {
   return (
     <section id="servicios" className="services">
       <div className="section-head">
-        <p className="kicker">Qué te llevás</p>
-        <h2>Un sistema web pensado para gente que tiene un negocio.</h2>
+        <p className="kicker">{SERVICES_INTRO.kicker}</p>
+        <h2>{SERVICES_INTRO.title}</h2>
       </div>
       <div className="service-grid">
         {SERVICES.map((service) => (

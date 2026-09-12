@@ -1,34 +1,27 @@
-import { MARQUEE } from '../content'
+import { HERO, MARQUEE } from '../content'
 
 export default function Hero() {
   return (
     <section className="hero">
       <div className="hero-grid">
         <div className="hero-copy">
-          <p className="kicker">Sitios y sistemas · Hosting propio · Hecho con IA</p>
+          <p className="kicker">{HERO.kicker}</p>
           <h1>
-            Tu negocio, online,
-            <em>fácil de entender.</em>
+            {HERO.titleBefore}
+            <em>{HERO.titleAccent}</em>
           </h1>
-          <p className="lede">
-            Te armamos el sitio o el sistema que tu negocio necesita: se ve profesional, se
-            entiende al toque y queda publicado en nuestro hosting. Vos te ocupás de vender;
-            nosotros de que internet trabaje para vos.
-          </p>
+          <p className="lede">{HERO.lede}</p>
           <div className="hero-actions">
             <a className="btn primary" href="#contacto">
-              Quiero mi sitio
+              {HERO.primary}
             </a>
             <a className="btn ghost" href="#proceso">
-              Cómo trabajamos
+              {HERO.secondary}
             </a>
           </div>
         </div>
         <figure className="hero-visual">
-          <img
-            src="/assets/hero-studio.png"
-            alt="Escritorio de estudio digital con laptop y ambiente azul oscuro"
-          />
+          <img src="/assets/hero-studio.png" alt={HERO.imageAlt} />
         </figure>
       </div>
       <div className="marquee" aria-hidden="true">

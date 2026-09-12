@@ -1,11 +1,11 @@
-import { STEPS } from '../content'
+import { PROCESS_INTRO, STEPS } from '../content'
 
 export default function Process() {
   return (
     <section id="proceso" className="process">
       <div className="section-head">
-        <p className="kicker">Cómo va el trabajo</p>
-        <h2>De tu primer mensaje a tu sitio en el aire.</h2>
+        <p className="kicker">{PROCESS_INTRO.kicker}</p>
+        <h2>{PROCESS_INTRO.title}</h2>
       </div>
       <ol>
         {STEPS.map((step) => (

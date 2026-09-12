@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { NEED_OPTIONS } from '../content'
+import { CONTACT, NEED_OPTIONS, SITE } from '../content'
 
-const MAILBOX = 'leonexo@nexosoft.site'
+const MAILBOX = SITE.email
 const EMPTY_FORM = {
   name: '',
   email: '',
@@ -45,7 +45,7 @@ export default function Contact() {
   async function onSubmit(event) {
     event.preventDefault()
     setSending(true)
-    setStatus('Enviando…')
+    setStatus(CONTACT.sending)
 
     try {
       const { response, data } = await sendBriefing(form)
@@ -53,9 +53,7 @@ export default function Contact() {
       const failed = String(data.success) === 'false'
 
       if (failed && /activate|confirm|email|web server/i.test(message)) {
-        setStatus(
-          'Te acaba de llegar un mail a leonexo@nexosoft.site para activar el formulario. Abrilo (también spam), confirmá el link y volvé a enviar el briefing.',
-        )
+        setStatus(CONTACT.activate)
         return
       }
 
@@ -64,9 +62,9 @@ export default function Contact() {
       }
 
       setField(EMPTY_FORM)
-      setStatus('Listo. El briefing llegó a leonexo@nexosoft.site. Te escribo en 24–48h.')
+      setStatus(CONTACT.sent)
     } catch {
-      setStatus('No se pudo enviar desde el sitio. Escribime a leonexo@nexosoft.site')
+      setStatus(CONTACT.fail)
     } finally {
       setSending(false)
     }
@@ -75,42 +73,40 @@ export default function Contact() {
   return (
     <section id="contacto" className="contact">
       <div>
-        <p className="kicker">Empezá acá</p>
-        <h2>Contame qué necesita tu negocio.</h2>
-        <p>
-          Te respondemos en 24 a 48 horas, en criollo. Si podemos ayudarte, te armamos el
-          camino. Si no es para nosotros, te lo decimos.
-        </p>
+        <p className="kicker">{CONTACT.kicker}</p>
+        <h2>{CONTACT.title}</h2>
+        <p>{CONTACT.lead}</p>
         <p className="slots">
-          Hay lugar para <strong>2 proyectos este mes</strong>
+          {CONTACT.slotsBefore}
+          <strong>{CONTACT.slotsStrong}</strong>
         </p>
       </div>
       <form onSubmit={onSubmit} autoComplete="on">
         <label>
-          Nombre
+          {CONTACT.name}
           <input
             name="name"
             required
             autoComplete="name"
-            placeholder="Tu nombre"
+            placeholder={CONTACT.namePlaceholder}
             value={form.name}
             onChange={onChange}
           />
         </label>
         <label>
-          Email
+          {CONTACT.email}
           <input
             name="email"
             type="email"
             required
             autoComplete="email"
-            placeholder="hola@marca.com"
+            placeholder={CONTACT.emailPlaceholder}
             value={form.email}
             onChange={onChange}
           />
         </label>
         <label>
-          Qué te gustaría tener
+          {CONTACT.need}
           <select name="need" value={form.need} onChange={onChange}>
             {NEED_OPTIONS.map((option) => (
               <option key={option}>{option}</option>
@@ -118,17 +114,17 @@ export default function Contact() {
           </select>
         </label>
         <label>
-          Contanos en una frase
+          {CONTACT.message}
           <textarea
             name="message"
             rows="4"
-            placeholder="Ej: tengo un local y quiero que la gente me escriba por WhatsApp"
+            placeholder={CONTACT.messagePlaceholder}
             value={form.message}
             onChange={onChange}
           />
         </label>
         <button className="btn primary" type="submit" disabled={sending}>
-          {sending ? 'Enviando…' : 'Quiero que me escriban'}
+          {sending ? CONTACT.sending : CONTACT.submit}
         </button>
         {status ? <p className="form-note">{status}</p> : null}
       </form>
