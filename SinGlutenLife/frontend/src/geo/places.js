@@ -1,4 +1,5 @@
 import { distanceKm } from './geo.js'
+import { loadGuidePlaces, mergeGuidePlaces, osmGlutenQuery, osmToGuidePlace } from './guides.js'
 
 /**
  * The list only carries places that a gluten-free guide publishes as such.
@@ -12,6 +13,7 @@ const OVERPASS_ENDPOINTS = [
 ]
 
 const GF_KM = 25
+const MAX_PLACES = 150
 const PHARMACY_KM = 5
 
 function coordsOf(el) {
@@ -68,18 +70,32 @@ function guideToPlace(item, origin) {
   }
 }
 
-async function fetchGuidePlaces(lat, lon) {
-  const params = new URLSearchParams({ lat: String(lat), lon: String(lon), km: String(GF_KM) })
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), 40000)
-  try {
-    const response = await fetch(`/api/gf-places?${params}`, { signal: controller.signal })
-    if (!response.ok) throw new Error('gf-places')
-    const data = await response.json()
-    return (data.places || []).map((item) => guideToPlace(item, { lat, lon }))
-  } finally {
-    clearTimeout(timer)
+async function overpass(query, timeoutMs = 15000) {
+  for (const endpoint of OVERPASS_ENDPOINTS) {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), timeoutMs)
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+        body: new URLSearchParams({ data: query }),
+        signal: controller.signal,
+      })
+      if (!response.ok) continue
+      const data = await response.json()
+      if (data?.elements) return data.elements
+    } catch {
+      // se prueba el espejo siguiente
+    } finally {
+      clearTimeout(timer)
+    }
   }
+  return []
+}
+
+async function fetchOsmGluten(lat, lon) {
+  const elements = await overpass(osmGlutenQuery(lat, lon, GF_KM))
+  return elements.map(osmToGuidePlace).filter(Boolean)
 }
 
 function pharmacyQuery(lat, lon) {
@@ -95,25 +111,13 @@ out body;
 }
 
 async function fetchPharmacies(lat, lon) {
-  const body = new URLSearchParams({ data: pharmacyQuery(lat, lon) })
-  for (const endpoint of OVERPASS_ENDPOINTS) {
-    const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), 12000)
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-        body,
-        signal: controller.signal,
-      })
-      if (!response.ok) continue
-      const data = await response.json()
-      return (data.elements || [])
-        .map((el) => {
-          const coords = coordsOf(el)
-          const tags = el.tags || {}
-          if (!coords || !tags.name) return null
-          return {
+  const elements = await overpass(pharmacyQuery(lat, lon), 12000)
+  return elements
+    .map((el) => {
+      const coords = coordsOf(el)
+      const tags = el.tags || {}
+      if (!coords || !tags.name) return null
+      return {
             id: `fa-${el.type || 'n'}-${el.id}`,
             name: tags.name,
             type: 'Farmacia',
@@ -134,26 +138,34 @@ async function fetchPharmacies(lat, lon) {
             guides: [],
             guideUrl: '',
             products: [],
-            osmType: el.type || 'node',
-            osmId: el.id,
-          }
-        })
-        .filter(Boolean)
-        .sort((a, b) => a.distanceKm - b.distanceKm)
-        .slice(0, 40)
-    } catch {
-      // try the next mirror
-    } finally {
-      clearTimeout(timer)
-    }
-  }
-  return []
+        osmType: el.type || 'node',
+        osmId: el.id,
+      }
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.distanceKm - b.distanceKm)
+    .slice(0, 40)
 }
 
+/**
+ * Primero las guías, que responden enseguida. OpenStreetMap y las farmacias
+ * llegan después: tardan y no deben demorar la lista.
+ */
 export async function fetchNearbyPlaces(lat, lon, onPartial) {
-  const places = await fetchGuidePlaces(lat, lon).catch(() => [])
+  const guide = await loadGuidePlaces(lat, lon, GF_KM).catch(() => [])
+  const places = guide.map((item) => guideToPlace(item, { lat, lon })).slice(0, MAX_PLACES)
   onPartial?.({ all: places, places, pharmacies: [] })
 
-  const pharmacies = await fetchPharmacies(lat, lon).catch(() => [])
-  return { all: [...places, ...pharmacies], places, pharmacies }
+  const [osm, pharmacies] = await Promise.all([
+    fetchOsmGluten(lat, lon).catch(() => []),
+    fetchPharmacies(lat, lon).catch(() => []),
+  ])
+
+  const merged = mergeGuidePlaces([...guide, ...osm])
+    .map((item) => guideToPlace(item, { lat, lon }))
+    .filter((place) => place.distanceKm <= GF_KM)
+    .sort((a, b) => a.distanceKm - b.distanceKm)
+    .slice(0, MAX_PLACES)
+
+  return { all: [...merged, ...pharmacies], places: merged, pharmacies }
 }

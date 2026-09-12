@@ -193,7 +193,9 @@ export async function loadCardPhoto(place, area = '') {
 }
 
 async function fetchLivePlace(place, area) {
-  const data = await fetchJson(`/api/place-info?${placeParams(place, area)}`, 30000)
+  // En Hostinger responde public/place-info.php; en dev, el mismo path lo
+  // atiende el motor en Node.
+  const data = await fetchJson(`/place-info.php?${placeParams(place, area)}`, 30000)
   return data || {}
 }
 
