@@ -1,9 +1,3 @@
-export const user = {
-  name: 'Leo',
-  city: 'CABA',
-  neighborhood: 'Palermo',
-}
-
 export const places = [
   {
     id: 'p1',

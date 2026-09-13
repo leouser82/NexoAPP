@@ -1,15 +1,14 @@
 import { Link } from 'react-router-dom'
 import PlaceCard from '../components/PlaceCard.jsx'
 import artComida from '../assets/comida-cerca.svg'
-import artFarmacias from '../assets/farmacias.svg'
 import artMenu from '../assets/menu-dia.svg'
 import artCocinar from '../assets/cocinar-casa.svg'
-import { dailyMeals, recipes, user } from '../data/mock.js'
+import { dailyMeals, recipes } from '../data/mock.js'
 import { useLocationData } from '../geo/LocationContext.jsx'
 
 export default function Home() {
-  const { places, pharmacies, placesStatus, label } = useLocationData()
-  const nearby = [...places, ...pharmacies].sort((a, b) => a.distanceKm - b.distanceKm)
+  const { places, placesStatus, label } = useLocationData()
+  const nearby = [...places].sort((a, b) => a.distanceKm - b.distanceKm)
   const nearest = nearby[0]
   const todayCost = dailyMeals.reduce((s, m) => s + m.cost, 0)
 
@@ -17,7 +16,7 @@ export default function Home() {
     <main className="page">
       <section className="hero">
         <div className="hero-kicker">Tu día sin TACC</div>
-        <h2>Hola {user.name}, hoy la mesa está de tu lado.</h2>
+        <h2>Hola, hoy la mesa está de tu lado.</h2>
         <p>
           Locales cerca de {label === 'Buscando…' ? 'vos' : label}, el menú del día y recetas que
           respetan tu presupuesto.
@@ -48,17 +47,6 @@ export default function Home() {
               {placesStatus === 'loading'
                 ? 'Buscando locales…'
                 : `${places.length} opciones cerca tuyo`}
-            </span>
-          </div>
-        </Link>
-        <Link className="quick-card photo-card" to="/farmacias">
-          <img src={artFarmacias} alt="" />
-          <div>
-            <h4>Farmacias</h4>
-            <span>
-              {placesStatus === 'loading'
-                ? 'Buscando farmacias…'
-                : `${pharmacies.length} a un paso`}
             </span>
           </div>
         </Link>

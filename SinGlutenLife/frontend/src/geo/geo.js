@@ -20,10 +20,20 @@ export function formatDistance(km) {
 }
 
 export function mapsUrl(place) {
+  if (place.googlePlaceId) {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name || '')}&query_place_id=${place.googlePlaceId}`
+  }
+  if (Number.isFinite(place.lat) && Number.isFinite(place.lon)) {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.name || ''} ${place.lat},${place.lon}`)}`
+  }
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.address || place.name)}`
+}
+
+export function mapsDirectionsUrl(place) {
   if (Number.isFinite(place.lat) && Number.isFinite(place.lon)) {
     return `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lon}`
   }
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.address || place.name)}`
+  return mapsUrl(place)
 }
 
 function gpsPosition() {

@@ -61,7 +61,7 @@ export function htmlToText(html) {
   return decodeEntities(
     String(html || '')
       .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<style[\s\S]*?(<\/style>|$)/gi, ' ')
       .replace(/<noscript[\s\S]*?<\/noscript>/gi, ' ')
       .replace(/<br\s*\/?>/gi, '\n')
       .replace(/<\/(p|div|li|tr|h\d)>/gi, '\n')
@@ -275,11 +275,24 @@ export function ratingFromText(text) {
 const REVIEW_NOISE =
   /cookie|javascript|iniciar sesi|pol[ií]tica|privacidad|t[eé]rminos|suscrib|copyright|derechos reservados|script|http|www\./i
 
+const REVIEW_CSS =
+  /[{}]|html:where|\[style|border-(?:top|right|bottom|left|style|width|color)|!important|\^=|\*=|:where\(|--[a-z]|[;{}[\]]{3}/i
+
+/** A review is a sentence, not a CSS rule or a navigation leftover. */
+export function isUsefulReview(text) {
+  const line = String(text || '').replace(/\s+/g, ' ').trim()
+  if (line.length < 20 || line.length > 400) return false
+  if (REVIEW_NOISE.test(line) || REVIEW_CSS.test(line)) return false
+  if (!/\s/.test(line)) return false
+  const letters = (line.match(/[a-záéíóúñü]/gi) || []).length
+  return letters >= 16 && letters / line.length > 0.45
+}
+
 export function reviewsFromJsonLd(node) {
   return asArray(node?.review)
     .map((review) => {
       const body = decodeEntities(review?.reviewBody || review?.description || '').trim()
-      if (!body || body.length < 15 || REVIEW_NOISE.test(body)) return null
+      if (!isUsefulReview(body)) return null
       const authorRaw = review?.author
       const author = decodeEntities(
         (typeof authorRaw === 'string' ? authorRaw : authorRaw?.name) || 'Cliente',
@@ -298,8 +311,7 @@ export function reviewsFromText(text) {
   for (const match of text.matchAll(/[“"]([^”"]{12,240})[”"]/g)) {
     const line = match[1].trim()
     const key = normalizeKey(line)
-    if (seen.has(key) || REVIEW_NOISE.test(line)) continue
-    if (!/[a-záéíóúñ]/i.test(line)) continue
+    if (seen.has(key) || !isUsefulReview(line)) continue
     if (!/(excelente|muy |rico|buen|fresc|atenci|calidad|recomiend|cordial|amable|delicios|precio|variedad|servicio)/i.test(line)) {
       continue
     }

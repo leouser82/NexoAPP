@@ -1,10 +1,92 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { formatDistance, mapsUrl } from '../geo/geo.js'
+import { formatDistance, mapsDirectionsUrl, mapsUrl } from '../geo/geo.js'
 import { hoursLines } from '../geo/guideHours.js'
 import { getCachedPlace } from '../geo/placeCache.js'
-import { formatArs, loadPlaceDetails } from '../geo/placeDetails.js'
+import { formatArs, getCachedReviews, loadPlaceDetails, loadPlaceReviews, mergeReviewPack } from '../geo/placeDetails.js'
 import { useLocationData } from '../geo/LocationContext.jsx'
+
+const EMPTY_REVIEWS = { reviews: [], rating: null, reviewCount: null, mapsUrl: '' }
+
+function offerKey(text) {
+  return String(text || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
+function sameOffer(a, b) {
+  const left = offerKey(a)
+  const right = offerKey(b)
+  if (!left || !right) return false
+  if (left === right) return true
+  const [short, long] = left.length <= right.length ? [left, right] : [right, left]
+  return short.length >= 10 && long.includes(short)
+}
+
+function hostOf(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '')
+  } catch {
+    return ''
+  }
+}
+
+function buildOfferCards(details, mentions, menu) {
+  const cards = []
+
+  const add = (card) => {
+    const text = String(card.text || '').trim()
+    if (!text) return
+    const twin = cards.find((item) => sameOffer(item.text, text))
+    if (twin) {
+      if (text.length > twin.text.length) twin.text = text
+      twin.gf = twin.gf || card.gf
+      twin.price = twin.price || card.price
+      twin.source = twin.source || card.source
+      if (card.note && !twin.notes.includes(card.note)) twin.notes.push(card.note)
+      return
+    }
+    cards.push({
+      text,
+      source: card.source || '',
+      gf: Boolean(card.gf),
+      price: card.price || null,
+      notes: card.note ? [card.note] : [],
+    })
+  }
+
+  for (const item of mentions) {
+    add({
+      text: item.text,
+      source: item.source,
+      gf: true,
+    })
+  }
+
+  for (const item of menu) {
+    add({
+      text: item.name,
+      source: details?.website || details?.sources?.[0] || '',
+      gf: Boolean(item.gf),
+      price: item.price || null,
+      note: item.gf ? 'Sin TACC' : 'Publicado en su web',
+    })
+  }
+
+  const site = details?.menuUrl || details?.website || ''
+  if (site && !cards.some((card) => hostOf(card.source) && hostOf(card.source) === hostOf(site))) {
+    add({
+      text: details?.menuUrl ? 'Carta o menú publicado por el local' : 'Sitio del local',
+      source: site,
+      note: hostOf(site),
+    })
+  }
+
+  return cards
+}
 
 export default function PlaceDetalle() {
   const { id } = useParams()
@@ -15,6 +97,7 @@ export default function PlaceDetalle() {
     [...places, ...pharmacies].find((item) => item.id === decoded) || getCachedPlace(decoded)
 
   const [details, setDetails] = useState(null)
+  const [reviewPack, setReviewPack] = useState(() => getCachedReviews(decoded) || EMPTY_REVIEWS)
   const [loading, setLoading] = useState(true)
   const [photoIndex, setPhotoIndex] = useState(0)
   const [tab, setTab] = useState('fotos')
@@ -23,15 +106,29 @@ export default function PlaceDetalle() {
   const dropPhoto = (url) => setBroken((prev) => new Set(prev).add(url))
 
   useEffect(() => {
+    setReviewPack(getCachedReviews(place?.id) || EMPTY_REVIEWS)
+    setDetails(null)
+    setPhotoIndex(0)
+  }, [place?.id])
+
+  useEffect(() => {
     if (!place) return
     let alive = true
     setLoading(true)
     loadPlaceDetails(place, label, (data) => {
       if (!alive) return
       setDetails(data)
+      if (data?.reviews?.length || data?.rating) {
+        setReviewPack((current) => mergeReviewPack(current, data))
+      }
       setLoading(false)
     }).finally(() => {
       if (alive) setLoading(false)
+    })
+    loadPlaceReviews(place, label).then((extra) => {
+      if (!alive) return
+      if (!extra?.reviews?.length && !extra?.rating) return
+      setReviewPack((current) => mergeReviewPack(current, extra))
     })
     return () => {
       alive = false
@@ -52,15 +149,18 @@ export default function PlaceDetalle() {
   const photos = (details?.photos || []).filter((url) => !broken.has(url))
   const photo = photos[photoIndex] || photos[0] || ''
   const menu = details?.menu || []
-  const reviews = details?.reviews || []
+  const reviews = reviewPack.reviews
+  const rating = reviewPack.rating || details?.rating || null
+  const reviewCount = reviewPack.reviewCount || details?.reviewCount || null
   const hours = details?.hours || { rows: [], openLabel: '' }
   const features = details?.features || []
   const gfMentions = details?.gfMentions || []
+  const offers = buildOfferCards(details, gfMentions, menu)
   const gfConfirmed = place.certified || details?.gfOfficial || details?.gfState === 'confirmado'
 
   const tabs = [
     { id: 'fotos', label: 'Fotos' },
-    menu.length ? { id: 'menu', label: 'Menú' } : null,
+    offers.length ? { id: 'menu', label: 'Menú' } : null,
     { id: 'horarios', label: 'Horarios' },
     { id: 'opiniones', label: 'Opiniones' },
   ].filter(Boolean)
@@ -75,11 +175,11 @@ export default function PlaceDetalle() {
         {place.type} · {formatDistance(place.distanceKm)}
       </p>
       <h2 className="page-title">{place.name}</h2>
-      {details?.rating ? (
+      {rating ? (
         <p className="place-rating">
-          <strong>{String(details.rating).replace('.', ',')}</strong>
-          <span className="stars">{'★★★★★'.slice(0, Math.round(details.rating))}</span>
-          {details.reviewCount ? <span>({details.reviewCount})</span> : null}
+          <strong>{String(rating).replace('.', ',')}</strong>
+          <span className="stars">{'★★★★★'.slice(0, Math.round(rating))}</span>
+          {reviewCount ? <span>({reviewCount})</span> : null}
         </p>
       ) : null}
       {place.address ? <p className="note" style={{ marginTop: 0 }}>{place.address}</p> : null}
@@ -188,13 +288,28 @@ export default function PlaceDetalle() {
         </section>
         <section className="card place-block" id="menu">
           <h3>Qué ofrecen sin TACC</h3>
-          {gfMentions.length ? (
+          {offers.length ? (
             <div className="gf-evidence">
-              {gfMentions.map((item) => (
-                <blockquote key={item.text.slice(0, 30)}>
+              {offers.map((item) => (
+                <article className="offer-card" key={item.text.slice(0, 48)}>
                   <p>{item.text}</p>
-                  <cite>{new URL(item.source).hostname.replace(/^www\./, '')}</cite>
-                </blockquote>
+                  <div className="offer-meta">
+                    {item.gf ? <span className="tag ok">Sin TACC</span> : null}
+                    {item.notes
+                      .filter((note) => note && note !== 'Sin TACC')
+                      .map((note) => (
+                        <span className="tag" key={note}>
+                          {note}
+                        </span>
+                      ))}
+                    {item.price ? <strong>{formatArs(item.price)}</strong> : null}
+                    {item.source ? (
+                      <a href={item.source} target="_blank" rel="noreferrer">
+                        {hostOf(item.source) || 'Fuente'}
+                      </a>
+                    ) : null}
+                  </div>
+                </article>
               ))}
             </div>
           ) : (
@@ -202,19 +317,6 @@ export default function PlaceDetalle() {
               No encontramos ninguna publicación del local sobre sin TACC. Preguntá antes de comprar.
             </p>
           )}
-          {menu.length ? (
-            <div className="menu-list">
-              {menu.map((item) => (
-                <article className="menu-row" key={item.name}>
-                  <div>
-                    <h4>{item.name}</h4>
-                    <p className="meta">{item.gf ? 'Sin TACC' : 'Publicado en su web'}</p>
-                  </div>
-                  {item.price ? <strong>{formatArs(item.price)}</strong> : null}
-                </article>
-              ))}
-            </div>
-          ) : null}
         </section>
       </div>
 
@@ -259,10 +361,10 @@ export default function PlaceDetalle() {
 
       <section className="card place-block" id="opiniones">
         <h3>Opiniones</h3>
-        {details?.rating ? (
+        {rating ? (
           <p className="note">
-            {details.rating} estrellas
-            {details.reviewCount ? ` · ${details.reviewCount} opiniones` : ''}
+            {String(rating).replace('.', ',')} estrellas en Google
+            {reviewCount ? ` · ${reviewCount} opiniones` : ''}
           </p>
         ) : null}
         {reviews.length ? (
@@ -296,7 +398,7 @@ export default function PlaceDetalle() {
       </section>
 
       <div className="hero-actions" style={{ marginTop: 18 }}>
-        <a className="btn btn-light" href={mapsUrl(place)} target="_blank" rel="noreferrer">
+        <a className="btn btn-light" href={mapsDirectionsUrl(place)} target="_blank" rel="noreferrer">
           Cómo llegar
         </a>
         {details?.website ? (

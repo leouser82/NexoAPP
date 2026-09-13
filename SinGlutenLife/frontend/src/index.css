@@ -646,22 +646,42 @@ a.card:hover,
   font-size: 0.84rem;
 }
 
-.gf-evidence blockquote {
-  margin: 0 0 10px;
-  padding: 10px 12px;
+.gf-evidence {
+  display: grid;
+  gap: 10px;
+}
+
+.gf-evidence blockquote,
+.offer-card {
+  margin: 0;
+  padding: 12px 14px;
   background: var(--ice);
   border-radius: 14px;
 }
 
-.gf-evidence blockquote p {
-  margin: 0 0 4px;
+.gf-evidence blockquote p,
+.offer-card p {
+  margin: 0 0 8px;
   font-size: 0.86rem;
 }
 
-.gf-evidence cite {
+.gf-evidence cite,
+.offer-meta a {
   color: var(--muted);
   font-size: 0.72rem;
   font-style: normal;
+}
+
+.offer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.offer-card strong {
+  font-size: 0.86rem;
+  color: var(--blue);
 }
 
 .distance {

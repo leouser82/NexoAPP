@@ -14,22 +14,6 @@ const OVERPASS_ENDPOINTS = [
 
 const GF_KM = 25
 const MAX_PLACES = 150
-const PHARMACY_KM = 5
-
-function coordsOf(el) {
-  if (Number.isFinite(el.lat) && Number.isFinite(el.lon)) {
-    return { lat: el.lat, lon: el.lon }
-  }
-  if (el.center && Number.isFinite(el.center.lat)) {
-    return { lat: el.center.lat, lon: el.center.lon }
-  }
-  return null
-}
-
-function addressOf(tags = {}) {
-  const street = [tags['addr:street'], tags['addr:housenumber']].filter(Boolean).join(' ')
-  return tags['addr:full'] || street || tags['addr:city'] || ''
-}
 
 function levelLabel(level) {
   return level === 'dedicado' ? '100% sin gluten' : 'Opciones sin TACC'
@@ -98,68 +82,16 @@ async function fetchOsmGluten(lat, lon) {
   return elements.map(osmToGuidePlace).filter(Boolean)
 }
 
-function pharmacyQuery(lat, lon) {
-  const radius = PHARMACY_KM * 1000
-  return `
-[out:json][timeout:18];
-(
-  node["amenity"="pharmacy"](around:${radius},${lat},${lon});
-  node["shop"="chemist"](around:${radius},${lat},${lon});
-);
-out body;
-`.trim()
-}
-
-async function fetchPharmacies(lat, lon) {
-  const elements = await overpass(pharmacyQuery(lat, lon), 12000)
-  return elements
-    .map((el) => {
-      const coords = coordsOf(el)
-      const tags = el.tags || {}
-      if (!coords || !tags.name) return null
-      return {
-            id: `fa-${el.type || 'n'}-${el.id}`,
-            name: tags.name,
-            type: 'Farmacia',
-            category: 'farmacia',
-            lat: coords.lat,
-            lon: coords.lon,
-            distanceKm: distanceKm({ lat, lon }, coords),
-            address: addressOf(tags),
-            city: [tags['addr:suburb'], tags['addr:city']].filter(Boolean).join(', '),
-            hours: tags.opening_hours || '',
-            tags: [],
-            certified: false,
-            level: '',
-            image: '',
-            photos: [],
-            phone: tags.phone || tags['contact:phone'] || '',
-            website: tags.website || tags['contact:website'] || '',
-            guides: [],
-            guideUrl: '',
-            products: [],
-        osmType: el.type || 'node',
-        osmId: el.id,
-      }
-    })
-    .filter(Boolean)
-    .sort((a, b) => a.distanceKm - b.distanceKm)
-    .slice(0, 40)
-}
-
 /**
- * Primero las guías, que responden enseguida. OpenStreetMap y las farmacias
- * llegan después: tardan y no deben demorar la lista.
+ * Primero las guías, que responden enseguida. OpenStreetMap llega después
+ * y no debe demorar la lista.
  */
 export async function fetchNearbyPlaces(lat, lon, onPartial) {
   const guide = await loadGuidePlaces(lat, lon, GF_KM).catch(() => [])
   const places = guide.map((item) => guideToPlace(item, { lat, lon })).slice(0, MAX_PLACES)
   onPartial?.({ all: places, places, pharmacies: [] })
 
-  const [osm, pharmacies] = await Promise.all([
-    fetchOsmGluten(lat, lon).catch(() => []),
-    fetchPharmacies(lat, lon).catch(() => []),
-  ])
+  const osm = await fetchOsmGluten(lat, lon).catch(() => [])
 
   const merged = mergeGuidePlaces([...guide, ...osm])
     .map((item) => guideToPlace(item, { lat, lon }))
@@ -167,5 +99,5 @@ export async function fetchNearbyPlaces(lat, lon, onPartial) {
     .sort((a, b) => a.distanceKm - b.distanceKm)
     .slice(0, MAX_PLACES)
 
-  return { all: [...merged, ...pharmacies], places: merged, pharmacies }
+  return { all: merged, places: merged, pharmacies: [] }
 }

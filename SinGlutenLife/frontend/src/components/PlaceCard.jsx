@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { formatDistance, mapsUrl } from '../geo/geo.js'
+import { formatDistance, mapsDirectionsUrl } from '../geo/geo.js'
 import { todayLine } from '../geo/guideHours.js'
 import { loadCardPhoto } from '../geo/placeDetails.js'
 import { useLocationData } from '../geo/LocationContext.jsx'
@@ -77,7 +77,7 @@ export default function PlaceCard({ place, extra, to }) {
             onClick={(event) => {
               event.preventDefault()
               event.stopPropagation()
-              window.open(mapsUrl(place), '_blank', 'noopener,noreferrer')
+              window.open(mapsDirectionsUrl(place), '_blank', 'noopener,noreferrer')
             }}
           >
             Cómo llegar

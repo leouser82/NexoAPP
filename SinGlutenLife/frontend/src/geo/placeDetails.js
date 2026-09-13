@@ -5,6 +5,7 @@ const SKIP_PHOTO = /8m|protest|marcha|logo|icon|flag|mapa|escudo|svg|coat of arm
 
 const photoCache = new Map()
 const detailCache = new Map()
+const reviewCache = new Map()
 const queue = []
 let active = 0
 
@@ -22,6 +23,18 @@ function normalize(value) {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
+}
+
+/** CSS and leftover markup sometimes arrive labeled as a review. */
+function isReadableReview(text) {
+  const line = String(text || '').replace(/\s+/g, ' ').trim()
+  if (line.length < 20 || line.length > 400) return false
+  if (/[{}]|html:where|\[style|border-(?:top|right|bottom|left|style|width|color)|!important|\^=|\*=|:where\(/i.test(line)) {
+    return false
+  }
+  if ((line.match(/[;{}[\]]/g) || []).length >= 3) return false
+  const letters = (line.match(/[a-záéíóúñü]/gi) || []).length
+  return letters >= 16 && /\s/.test(line)
 }
 
 function nameMatches(name, title) {
@@ -74,6 +87,9 @@ function placeParams(place, area = '') {
     lon: String(place.lon ?? ''),
     type: place.type || '',
     website: place.website || '',
+    id: place.id || '',
+    guideUrl: place.guideUrl || '',
+    googlePlaceId: place.googlePlaceId || '',
   })
 }
 
@@ -192,6 +208,56 @@ export async function loadCardPhoto(place, area = '') {
   })
 }
 
+function packReviews(data = {}) {
+  return {
+    reviews: (data.reviews || []).filter((review) => isReadableReview(review?.text)),
+    rating: data.rating ?? null,
+    reviewCount: data.reviewCount ?? null,
+    mapsUrl: data.mapsUrl || '',
+  }
+}
+
+/** Keep texts that already arrived. Later empty/failed fetches must not erase them. */
+export function mergeReviewPack(current, extra) {
+  const base = current || { reviews: [], rating: null, reviewCount: null, mapsUrl: '' }
+  const incoming = packReviews(extra)
+  const seen = new Set(base.reviews.map((review) => String(review.text || '').slice(0, 60)))
+  const reviews = [...base.reviews]
+  for (const review of incoming.reviews) {
+    const key = String(review.text || '').slice(0, 60)
+    if (!key || seen.has(key)) continue
+    seen.add(key)
+    reviews.push(review)
+  }
+  return {
+    reviews: reviews.slice(0, 8),
+    rating: incoming.rating || base.rating || null,
+    reviewCount: incoming.reviewCount || base.reviewCount || null,
+    mapsUrl: incoming.mapsUrl || base.mapsUrl || '',
+  }
+}
+
+export function getCachedReviews(id) {
+  return reviewCache.get(id) || null
+}
+
+/** Only the detail page asks: score and texts from the guide / Google snapshot. */
+export async function loadPlaceReviews(place, area = '') {
+  const cached = reviewCache.get(place.id)
+  if (cached?.reviews?.length || cached?.rating) return cached
+
+  try {
+    const data = packReviews(await fetchJson(`/place-reviews.php?${placeParams(place, area)}`, 12000))
+    if (data.reviews.length || data.rating) {
+      reviewCache.set(place.id, data)
+      return data
+    }
+    return cached || data
+  } catch {
+    return cached || { reviews: [], rating: null, reviewCount: null, mapsUrl: '' }
+  }
+}
+
 async function fetchLivePlace(place, area) {
   // En Hostinger responde public/place-info.php; en dev, el mismo path lo
   // atiende el motor en Node.
@@ -248,7 +314,7 @@ function assembleDetails(place, tags, wikiData, photos, live = {}) {
     menu: live.menu || [],
     gfMentions: [...guideMention(place), ...(live.gfMentions || [])].slice(0, 4),
     gfState: place.level ? 'confirmado' : live.gfState || 'desconocido',
-    reviews: live.reviews || [],
+    reviews: (live.reviews || []).filter((review) => isReadableReview(review?.text)),
     rating: live.rating || null,
     reviewCount: live.reviewCount || null,
     features: live.features || [],

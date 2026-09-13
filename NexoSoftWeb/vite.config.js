@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
 import { lookupPhoto, lookupPlace } from './placeInfo.js'
 import { celimapRaw } from './scraper/gfGuides.js'
+import { lookupReviews } from './scraper/googleReviews.js'
 import { build as viteBuild, createServer, defineConfig } from 'vite'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -71,7 +72,8 @@ function placeInfoEndpoint() {
         const isPhoto = pathName === '/api/place-photo'
         // Same path as production, where it is served by public/gf-guides.php.
         const isGuides = pathName === '/gf-guides.php'
-        if (!isInfo && !isPhoto && !isGuides) {
+        const isReviews = pathName === '/place-reviews.php' || pathName === '/api/place-reviews'
+        if (!isInfo && !isPhoto && !isGuides && !isReviews) {
           return next()
         }
         const url = new URL(req.url, 'http://127.0.0.1')
@@ -83,10 +85,14 @@ function placeInfoEndpoint() {
           type: url.searchParams.get('type') || '',
           area: url.searchParams.get('area') || '',
           website: url.searchParams.get('website') || '',
+          id: url.searchParams.get('id') || '',
+          guideUrl: url.searchParams.get('guideUrl') || '',
+          googlePlaceId: url.searchParams.get('googlePlaceId') || '',
         }
         try {
           let data
           if (isGuides) data = await celimapRaw()
+          else if (isReviews) data = await lookupReviews(query)
           else if (isPhoto) data = await lookupPhoto(query)
           else data = await lookupPlace(query)
           const payload = JSON.stringify(data)
