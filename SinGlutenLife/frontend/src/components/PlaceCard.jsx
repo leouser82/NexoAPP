@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatDistance, mapsDirectionsUrl } from '../geo/geo.js'
-import { todayLine } from '../geo/guideHours.js'
+import { isOpenNow, todayLine } from '../geo/guideHours.js'
 import { loadCardPhoto } from '../geo/placeDetails.js'
 import { useLocationData } from '../geo/LocationContext.jsx'
 
@@ -85,6 +85,7 @@ export default function PlaceCard({ place, extra, to }) {
         ) : null}
       </div>
       <div className="tags">
+        {isOpenNow(place.hours) === true ? <span className="tag ok">Abierto ahora</span> : null}
         <GlutenTag place={place} />
         {/mixta/i.test(place.kitchen || '') ? <span className="tag">Cocina mixta</span> : null}
         {(place.guides || []).length > 1 ? <span className="tag">En {place.guides.length} guías</span> : null}

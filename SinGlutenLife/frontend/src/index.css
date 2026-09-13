@@ -858,6 +858,49 @@ input[type='range'] {
   color: #fff;
 }
 
+.trust-line {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  background: var(--ice);
+  border-radius: 16px;
+  color: #21536f;
+  font-size: 0.86rem;
+}
+
+.recipe-photo {
+  margin: 0 0 10px;
+}
+
+.recipe-photo img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+  border-radius: 16px;
+}
+
+.recipe-photo.detail img {
+  height: 220px;
+}
+
+.recipe-photo figcaption {
+  margin-top: 6px;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.recipe-photo.on-blue {
+  margin: 0 0 12px;
+}
+
+.recipe-photo.on-blue img {
+  border-radius: 14px;
+}
+
+.recipe-photo.on-blue figcaption {
+  color: #d7f0fb;
+}
+
 .recipe-feature-kicker {
   display: inline-block;
   font-size: 0.72rem;

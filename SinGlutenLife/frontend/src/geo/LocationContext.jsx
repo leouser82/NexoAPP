@@ -13,6 +13,7 @@ const LocationContext = createContext({
   placesStatus: 'idle',
   error: '',
   locate: () => {},
+  browseArea: () => {},
 })
 
 export function LocationProvider({ children }) {
@@ -24,6 +25,14 @@ export function LocationProvider({ children }) {
   const [pharmacies, setPharmacies] = useState([])
   const [placesStatus, setPlacesStatus] = useState('idle')
   const [error, setError] = useState('')
+
+  const applyFix = useCallback((found) => {
+    setCoords({ lat: found.lat, lon: found.lon })
+    setLabel(found.label)
+    setSource(found.source)
+    setStatus('ready')
+    setError('')
+  }, [])
 
   const loadPlaces = useCallback(async (lat, lon) => {
     setPlacesStatus('loading')
@@ -50,18 +59,26 @@ export function LocationProvider({ children }) {
     setError('')
     setLabel('Buscando…')
     try {
-      const found = await detectLocation()
-      setCoords({ lat: found.lat, lon: found.lon })
-      setLabel(found.label)
-      setSource(found.source)
-      setStatus('ready')
+      const found = await detectLocation((early) => {
+        applyFix(early)
+        loadPlaces(early.lat, early.lon)
+      })
+      applyFix(found)
       await loadPlaces(found.lat, found.lon)
     } catch {
       setStatus('error')
       setLabel('Ubicación no disponible')
-      setError('No pudimos leer tu ubicación. Activá el GPS y reintentá.')
+      setError('No pudimos leer tu ubicación. Elegí una ciudad o activá el GPS.')
     }
-  }, [loadPlaces])
+  }, [applyFix, loadPlaces])
+
+  const browseArea = useCallback(
+    async (area) => {
+      applyFix({ lat: area.lat, lon: area.lon, label: area.label, source: 'manual' })
+      await loadPlaces(area.lat, area.lon)
+    },
+    [applyFix, loadPlaces],
+  )
 
   useEffect(() => {
     locate()
@@ -78,8 +95,9 @@ export function LocationProvider({ children }) {
       placesStatus,
       error,
       locate,
+      browseArea,
     }),
-    [status, coords, label, source, places, pharmacies, placesStatus, error, locate],
+    [status, coords, label, source, places, pharmacies, placesStatus, error, locate, browseArea],
   )
 
   return <LocationContext.Provider value={value}>{children}</LocationContext.Provider>

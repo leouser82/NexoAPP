@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import RecipePhoto from '../components/RecipePhoto.jsx'
 import { recipes } from '../data/recipes.js'
 import { formatDistance } from '../geo/geo.js'
 import { loadGroceryShops, mapsShopUrl, shopForIngredient, shopKindLabel } from '../geo/ingredientShops.js'
@@ -47,6 +48,7 @@ export default function RecetaDetalle() {
         ← Volver
       </button>
       <h2 className="page-title">{recipe.title}</h2>
+      <RecipePhoto recipe={recipe} className="recipe-photo detail" />
       <p className="note" style={{ marginTop: 0 }}>
         {recipe.summary}
       </p>

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import RecipePhoto from '../components/RecipePhoto.jsx'
 import { recipeTags, recipes } from '../data/recipes.js'
 
 export default function Recetas() {
@@ -46,6 +47,7 @@ export default function Recetas() {
       <div className="grid-cards">
         {list.map((recipe) => (
           <Link key={recipe.id} className="card recipe-card" to={`/recetas/${recipe.id}`}>
+            <RecipePhoto recipe={recipe} />
             <h4>{recipe.title}</h4>
             <p>{recipe.summary}</p>
             <div className="tags">

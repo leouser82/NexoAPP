@@ -1,97 +1,132 @@
 import { Link } from 'react-router-dom'
+import AreaChips from '../components/AreaChips.jsx'
 import PlaceCard from '../components/PlaceCard.jsx'
-import artComida from '../assets/comida-cerca.svg'
-import artCocinar from '../assets/cocinar-casa.svg'
-import { recipes } from '../data/recipes.js'
+import RecipePhoto from '../components/RecipePhoto.jsx'
+import { recipeOfTheDay, recipes } from '../data/recipes.js'
+import { isOpenNow } from '../geo/guideHours.js'
 import { useLocationData } from '../geo/LocationContext.jsx'
 
 export default function Home() {
-  const { places, placesStatus, label } = useLocationData()
+  const { places, placesStatus, label, status, locate, source, error } = useLocationData()
   const nearby = [...places].sort((a, b) => a.distanceKm - b.distanceKm)
   const nearest = nearby[0]
-  const featured = recipes[3]
+  const daily = recipeOfTheDay()
+  const openNow = nearby.filter((place) => isOpenNow(place.hours) === true).slice(0, 3)
+  const thinCoverage = placesStatus === 'ready' && places.length > 0 && places.length < 12
+  const waitingPlaces = status === 'locating' || placesStatus === 'loading'
 
   return (
     <main className="page">
       <section className="hero">
-        <div className="hero-kicker">Tu día sin TACC</div>
+        <div className="hero-kicker">Guías sin TACC, cerca tuyo</div>
         <h2>Hola, hoy la mesa está de tu lado.</h2>
         <p>
-          Locales cerca de {label === 'Buscando…' ? 'vos' : label} y recetas publicadas para cocinar en casa.
+          Solo locales que ya figuran en CeliMap o SinTaccto. No es una certificación: confirmá el
+          protocolo en el lugar. También hay recetas publicadas y dónde comprar cada ingrediente.
         </p>
         <div className="hero-actions">
           <Link className="btn btn-light" to="/lugares">
             Ver qué hay cerca
           </Link>
-          <Link className="btn btn-ghost" to="/recetas">
-            Ver recetas
+          <Link className="btn btn-ghost" to={`/recetas/${daily.id}`}>
+            Receta del día
           </Link>
         </div>
         <div className="badge-row">
           <span className="badge">Celíaco / intolerante</span>
-          <span className="badge">Hecho para Argentina</span>
+          <span className="badge">Argentina</span>
         </div>
       </section>
 
-      <div className="section-head">
-        <h3>Empezá por acá</h3>
-      </div>
-      <div className="grid-2">
-        <Link className="quick-card photo-card" to="/lugares">
-          <img src={artComida} alt="" />
-          <div>
-            <h4>Comida cerca</h4>
-            <span>
-              {placesStatus === 'loading'
-                ? 'Buscando locales…'
-                : `${places.length} opciones cerca tuyo`}
-            </span>
-          </div>
-        </Link>
-        <Link className="quick-card photo-card" to="/recetas">
-          <img src={artCocinar} alt="" />
-          <div>
-            <h4>Cocinar en casa</h4>
-            <span>{recipes.length} recetas publicadas, sin precios inventados</span>
-          </div>
-        </Link>
-      </div>
+      <p className="trust-line">
+        Juntamos dos guías para no mostrar un restaurante cualquiera. Si un local no está en esas
+        listas, acá no aparece.
+      </p>
 
       <div className="section-head">
-        <h3>A un paso tuyo</h3>
-        <Link to="/lugares">Ver todas</Link>
+        <h3>Receta de hoy</h3>
+        <Link to="/recetas">Ver todas</Link>
       </div>
-      {nearest ? (
-        <PlaceCard place={nearest} />
-      ) : (
-        <p className="note">
-          {placesStatus === 'loading'
-            ? 'Estamos midiendo qué hay cerca de tu ubicación…'
-            : 'Todavía no encontramos lugares cerca. Probá actualizar la ubicación.'}
-        </p>
-      )}
-
-      <div className="section-head">
-        <h3>Una receta para hoy</h3>
-        <Link to="/recetas">Ver recetas</Link>
-      </div>
-      <Link className="card recipe-feature" to={`/recetas/${featured.id}`}>
-        <span className="recipe-feature-kicker">Receta de {featured.sourceName}</span>
-        <h4>{featured.title}</h4>
-        <p>{featured.summary}</p>
-        <div className="tags">
-          {featured.tags.map((item) => (
-            <span className="tag" key={item}>
-              {item}
-            </span>
-          ))}
-        </div>
+      <Link className="card recipe-feature" to={`/recetas/${daily.id}`}>
+        <RecipePhoto recipe={daily} className="recipe-photo on-blue" />
+        <span className="recipe-feature-kicker">Cambia cada día · {daily.sourceName}</span>
+        <h4>{daily.title}</h4>
+        <p>{daily.summary}</p>
         <div className="row-stats" style={{ marginTop: 10 }}>
-          <span>{featured.minutes} min</span>
-          <span>{featured.servings} porciones</span>
-          <span>{featured.difficulty}</span>
+          <span>{daily.minutes} min</span>
+          <span>{daily.servings} porciones</span>
+          <span>{daily.difficulty}</span>
         </div>
       </Link>
+
+      <div className="section-head">
+        <h3>
+          {waitingPlaces
+            ? 'Buscando locales cerca'
+            : source === 'manual'
+              ? `Cerca de ${label}`
+              : `Cerca de ${label === 'Buscando…' ? 'vos' : label}`}
+        </h3>
+        <Link to="/lugares">Ver lista</Link>
+      </div>
+      {error ? (
+        <p className="note">
+          {error}{' '}
+          <button type="button" className="text-btn" onClick={locate}>
+            Usar GPS
+          </button>
+        </p>
+      ) : null}
+      {thinCoverage ? (
+        <p className="banner-proto">
+          En esta zona las guías publican {places.length} locales. Eso no significa que no haya más:
+          significa que no están en CeliMap o SinTaccto. Podés mirar otra ciudad.
+        </p>
+      ) : null}
+      {placesStatus === 'ready' && places.length === 0 ? (
+        <p className="banner-proto">
+          Las guías no tienen locales publicados a menos de 25 km. Elegí una ciudad con más cobertura
+          o actualizá el GPS.
+        </p>
+      ) : null}
+      <p className="note" style={{ marginBottom: 8 }}>
+        Si el GPS tarda o no está, elegí una ciudad. Las distancias se miden desde ese punto.
+      </p>
+      <AreaChips />
+
+      {openNow.length ? (
+        <>
+          <div className="section-head">
+            <h3>Abiertos ahora</h3>
+          </div>
+          <p className="note" style={{ marginTop: 0 }}>
+            Según el horario que publicó la guía. Confirmá en el local.
+          </p>
+          {openNow.map((place) => (
+            <PlaceCard key={place.id} place={place} extra={<span className="tag ok">Abierto ahora</span>} />
+          ))}
+        </>
+      ) : null}
+
+      {nearest ? (
+        <>
+          <div className="section-head">
+            <h3>El más cercano</h3>
+            <Link to="/lugares">Ver todas</Link>
+          </div>
+          <PlaceCard place={nearest} />
+        </>
+      ) : waitingPlaces ? (
+        <p className="note">Estamos leyendo las guías cerca de tu zona…</p>
+      ) : null}
+
+      <div className="section-head">
+        <h3>Cocinar en casa</h3>
+        <Link to="/recetas">{recipes.length} recetas</Link>
+      </div>
+      <p className="note" style={{ marginTop: 0 }}>
+        Cada receta tiene fuente. En la ficha te sugerimos un comercio cerca para cada ingrediente.
+      </p>
     </main>
   )
 }

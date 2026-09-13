@@ -85,9 +85,16 @@ async function ipLocation() {
   }
 }
 
-export async function detectLocation() {
-  try {
-    const pos = await gpsPosition()
+export async function detectLocation(onEarly) {
+  let ip = null
+  const ipTask = ipLocation()
+    .then((data) => {
+      ip = data
+      return data
+    })
+    .catch(() => null)
+
+  const gpsTask = gpsPosition().then(async (pos) => {
     const lat = pos.coords.latitude
     const lon = pos.coords.longitude
     let label = 'Tu ubicación'
@@ -97,8 +104,24 @@ export async function detectLocation() {
       label = 'Tu ubicación'
     }
     return { lat, lon, label, source: 'gps', accuracy: pos.coords.accuracy }
+  })
+
+  const early = await Promise.race([
+    gpsTask,
+    ipTask.then(
+      (data) =>
+        new Promise((resolve) => {
+          setTimeout(() => resolve(data), 800)
+        }),
+    ),
+  ])
+  if (early) onEarly?.(early)
+
+  try {
+    return await gpsTask
   } catch {
-    const fallback = await ipLocation()
+    const fallback = ip || (await ipTask)
+    if (!fallback) throw new Error('no-loc')
     return fallback
   }
 }

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import AreaChips from '../components/AreaChips.jsx'
 import PlaceCard from '../components/PlaceCard.jsx'
 import { useLocationData } from '../geo/LocationContext.jsx'
 
@@ -34,14 +35,24 @@ export default function Lugares() {
             ? `Ubicación real · ${label}. Distancia medida en línea recta.`
             : source === 'ip'
               ? `Ubicación aproximada por red · ${label}. Tocá el pin de arriba para usar el GPS.`
-              : error || 'No pudimos leer tu ubicación. Tocá el pin de arriba para reintentar.'}
+              : source === 'manual'
+                ? `Ciudad elegida · ${label}. Distancia desde el centro.`
+                : error || 'No pudimos leer tu ubicación. Elegí una ciudad o tocá el pin.'}
       </div>
       <h2 className="page-title">¿Dónde comemos hoy?</h2>
       <p className="note" style={{ margin: '0 0 14px' }}>
         {places.length
-          ? `${places.length} lugares sin TACC a menos de 25 km, ${dedicated} con cocina 100% libre de gluten. Datos de ${guides.join(', ')}. Confirmá siempre el protocolo en el local.`
-          : 'Solo mostramos lugares que figuran en guías sin TACC. Ninguna etiqueta reemplaza preguntar en el local.'}
+          ? `${places.length} lugares en las guías a menos de 25 km, ${dedicated} con cocina 100% libre de gluten. Datos de ${guides.join(', ') || 'CeliMap y SinTaccto'}. Confirmá siempre el protocolo en el local.`
+          : 'Solo mostramos lugares que figuran en CeliMap o SinTaccto. Si no está en esas listas, acá no aparece.'}
       </p>
+      {placesStatus === 'ready' && places.length > 0 && places.length < 12 ? (
+        <p className="banner-proto">
+          Poca cobertura en esta zona: las guías publican {places.length} locales. No inventamos el resto.
+          Probá otra ciudad.
+        </p>
+      ) : null}
+      <p className="note">Mirar otra ciudad</p>
+      <AreaChips />
       <input
         className="search"
         placeholder="Buscar por nombre, barrio o dirección…"
@@ -66,14 +77,18 @@ export default function Lugares() {
           <PlaceCard key={p.id} place={p} />
         ))}
       </div>
-      {placesStatus === 'loading' && <p className="note">Cargando guías sin TACC…</p>}
-      {placesStatus === 'ready' && list.length === 0 && (
+      {placesStatus === 'loading' && <p className="note">Cargando las guías…</p>}
+      {placesStatus === 'ready' && places.length === 0 && (
         <p className="note">
-          No hay resultados con ese filtro.{' '}
+          Las guías no listan locales a 25 km de {label}. Elegí una ciudad arriba o{' '}
           <button type="button" className="text-btn" onClick={locate}>
-            Actualizar ubicación
+            usá el GPS
           </button>
+          .
         </p>
+      )}
+      {placesStatus === 'ready' && places.length > 0 && list.length === 0 && (
+        <p className="note">No hay resultados con ese filtro.</p>
       )}
     </main>
   )

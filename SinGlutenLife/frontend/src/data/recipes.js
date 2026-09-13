@@ -11,6 +11,7 @@ export const recipes = [
     summary: 'Masa de arroz cocido, huevo y queso. Receta sin TACC de Soy Celíaco No Extraterrestre.',
     sourceName: 'Soy Celíaco No Extraterrestre',
     sourceUrl: 'https://www.soyceliaconoextraterrestre.com/pizza-de-arroz-sin-gluten/',
+    image: '',
     ingredients: [
       { name: 'Arroz blanco o integral cocido y frío', qty: '2 tazas', shop: 'almacen' },
       { name: 'Queso rallado sin gluten', qty: '100 g', shop: 'dietetica' },
@@ -36,6 +37,7 @@ export const recipes = [
     summary: 'Carne pasada por huevo y polenta como rebozador. Publicada por Soy Celíaco No Extraterrestre.',
     sourceName: 'Soy Celíaco No Extraterrestre',
     sourceUrl: 'https://www.soyceliaconoextraterrestre.com/milanesas-sin-gluten/',
+    image: 'https://www.soyceliaconoextraterrestre.com/wp-content/uploads/2020/01/milanesas-para-celiacos-sin-gluten.jpg',
     ingredients: [
       { name: 'Carne para milanesa', qty: '500 g', shop: 'carniceria' },
       { name: 'Huevo', qty: '1 u', shop: 'almacen' },
@@ -60,6 +62,7 @@ export const recipes = [
     summary: 'Cinco ingredientes. Receta de Alejandra Budán en Soy Celíaco No Extraterrestre.',
     sourceName: 'Soy Celíaco No Extraterrestre',
     sourceUrl: 'https://www.soyceliaconoextraterrestre.com/milanesas-de-berenjena-libres-de-gluten/',
+    image: 'https://www.soyceliaconoextraterrestre.com/wp-content/uploads/2020/02/milanesas-de-berenjena.jpg',
     ingredients: [
       { name: 'Berenjena', qty: '1 u', shop: 'verduleria' },
       { name: 'Huevos', qty: '2 u', shop: 'almacen' },
@@ -85,6 +88,7 @@ export const recipes = [
     summary: 'Papa, huevo y almidón de maíz. Receta de Soy Celíaco No Extraterrestre.',
     sourceName: 'Soy Celíaco No Extraterrestre',
     sourceUrl: 'https://www.soyceliaconoextraterrestre.com/noquis-sin-gluten-con-maicena/',
+    image: 'https://www.soyceliaconoextraterrestre.com/wp-content/uploads/2019/07/Noquis-sin-TACC-con-maicena-1.jpg',
     ingredients: [
       { name: 'Papa', qty: '½ kg', shop: 'verduleria' },
       { name: 'Huevo', qty: '1 u', shop: 'almacen' },
@@ -109,6 +113,7 @@ export const recipes = [
     summary: 'Tapas con papa y maicena, sin lácteos ni huevo. Publicada por Soy Celíaco No Extraterrestre.',
     sourceName: 'Soy Celíaco No Extraterrestre',
     sourceUrl: 'https://www.soyceliaconoextraterrestre.com/masa-de-papa-para-empanadas/',
+    image: 'https://www.soyceliaconoextraterrestre.com/wp-content/uploads/2022/04/masa-de-papa-para-empanadas-1.jpg',
     ingredients: [
       { name: 'Papa', qty: '400 g', shop: 'verduleria' },
       { name: 'Almidón de maíz o maicena', qty: '100 g', shop: 'almacen' },
@@ -132,6 +137,7 @@ export const recipes = [
     summary: 'Pan de fécula de mandioca y queso, de tradición guaraní. Receta publicada por LM Neuquén.',
     sourceName: 'LM Neuquén',
     sourceUrl: 'https://www.lmneuquen.com/el-comedor/chipa-casero-la-receta-facil-hacer-casa-n1251832',
+    image: 'https://media.lmneuquen.com/p/fa90f9cf86490358a539fecaa9a7b7f4/adjuntos/195/imagenes/007/845/0007845861/1200x675/smart/chipa-placa-00.jpg',
     ingredients: [
       { name: 'Fécula de mandioca', qty: '500 g', shop: 'dietetica' },
       { name: 'Queso criollo', qty: '200 g', shop: 'almacen' },
@@ -158,6 +164,7 @@ export const recipes = [
     summary: 'Base de quinoa cocida, huevo y verduras. Receta de Cocineros Argentinos.',
     sourceName: 'Cocineros Argentinos',
     sourceUrl: 'https://www.cocinerosargentinos.com/recetas/apto-celiaco/pizza-de-quinoa',
+    image: '',
     ingredients: [
       { name: 'Quinoa cocida', qty: '600 g', shop: 'dietetica' },
       { name: 'Cebolla', qty: '1 u', shop: 'verduleria' },
@@ -180,3 +187,9 @@ export const recipes = [
 ]
 
 export const recipeTags = ['Todas', 'Almuerzo', 'Cena', 'Merienda', 'Sin harina', 'Vegetariano', 'Clásico']
+
+/** Same recipe all day, rotates with the calendar. */
+export function recipeOfTheDay(date = new Date()) {
+  const day = Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000)
+  return recipes[Math.abs(day) % recipes.length]
+}
