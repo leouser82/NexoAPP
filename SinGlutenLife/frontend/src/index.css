@@ -799,6 +799,16 @@ input[type='range'] {
   font-size: 0.88rem;
 }
 
+.recipe-card .meta {
+  margin: 0;
+}
+
+.filters .tag {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
 .row-stats {
   display: flex;
   gap: 10px;

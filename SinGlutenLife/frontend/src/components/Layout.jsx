@@ -1,11 +1,10 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { BrandMark, IconBook, IconHome, IconMeal, IconPin, IconShop } from './Icons.jsx'
+import { BrandMark, IconBook, IconHome, IconPin, IconShop } from './Icons.jsx'
 import { useLocationData } from '../geo/LocationContext.jsx'
 
 const links = [
   { to: '/', label: 'Inicio', icon: IconHome, end: true },
   { to: '/lugares', label: 'Lugares', icon: IconShop },
-  { to: '/menu', label: 'Menú', icon: IconMeal },
   { to: '/recetas', label: 'Recetas', icon: IconBook },
 ]
 

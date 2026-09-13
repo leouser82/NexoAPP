@@ -1,16 +1,15 @@
 import { Link } from 'react-router-dom'
 import PlaceCard from '../components/PlaceCard.jsx'
 import artComida from '../assets/comida-cerca.svg'
-import artMenu from '../assets/menu-dia.svg'
 import artCocinar from '../assets/cocinar-casa.svg'
-import { dailyMeals, recipes } from '../data/mock.js'
+import { recipes } from '../data/recipes.js'
 import { useLocationData } from '../geo/LocationContext.jsx'
 
 export default function Home() {
   const { places, placesStatus, label } = useLocationData()
   const nearby = [...places].sort((a, b) => a.distanceKm - b.distanceKm)
   const nearest = nearby[0]
-  const todayCost = dailyMeals.reduce((s, m) => s + m.cost, 0)
+  const featured = recipes[3]
 
   return (
     <main className="page">
@@ -18,15 +17,14 @@ export default function Home() {
         <div className="hero-kicker">Tu día sin TACC</div>
         <h2>Hola, hoy la mesa está de tu lado.</h2>
         <p>
-          Locales cerca de {label === 'Buscando…' ? 'vos' : label}, el menú del día y recetas que
-          respetan tu presupuesto.
+          Locales cerca de {label === 'Buscando…' ? 'vos' : label} y recetas publicadas para cocinar en casa.
         </p>
         <div className="hero-actions">
           <Link className="btn btn-light" to="/lugares">
             Ver qué hay cerca
           </Link>
-          <Link className="btn btn-ghost" to="/menu">
-            Armar el día
+          <Link className="btn btn-ghost" to="/recetas">
+            Ver recetas
           </Link>
         </div>
         <div className="badge-row">
@@ -50,18 +48,11 @@ export default function Home() {
             </span>
           </div>
         </Link>
-        <Link className="quick-card photo-card" to="/menu">
-          <img src={artMenu} alt="" />
-          <div>
-            <h4>Menú de hoy</h4>
-            <span>${todayCost.toLocaleString('es-AR')} para las 4 comidas</span>
-          </div>
-        </Link>
         <Link className="quick-card photo-card" to="/recetas">
           <img src={artCocinar} alt="" />
           <div>
             <h4>Cocinar en casa</h4>
-            <span>Recetas que entran en tu bolsillo</span>
+            <span>{recipes.length} recetas publicadas, sin precios inventados</span>
           </div>
         </Link>
       </div>
@@ -81,15 +72,15 @@ export default function Home() {
       )}
 
       <div className="section-head">
-        <h3>Una idea rica y económica</h3>
+        <h3>Una receta para hoy</h3>
         <Link to="/recetas">Ver recetas</Link>
       </div>
-      <Link className="card recipe-card" to={`/recetas/${recipes[2].id}`}>
-        <h4>{recipes[2].title}</h4>
-        <p>{recipes[2].summary}</p>
+      <Link className="card recipe-card" to={`/recetas/${featured.id}`}>
+        <h4>{featured.title}</h4>
+        <p>{featured.summary}</p>
         <div className="row-stats">
-          <span>{recipes[2].minutes} min</span>
-          <span>${recipes[2].cost.toLocaleString('es-AR')}</span>
+          <span>{featured.minutes} min</span>
+          <span>{featured.difficulty}</span>
         </div>
       </Link>
     </main>
