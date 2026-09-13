@@ -17,12 +17,14 @@ export default function Recetas() {
   }, [q, tag])
 
   return (
-    <main className="page">
-      <h2 className="page-title">Cociná sin TACC</h2>
-      <p className="note" style={{ margin: '0 0 14px' }}>
-        Recetas publicadas, con el paso a paso y un lugar cerca para cada ingrediente. Confirmá siempre el sello sin
-        TACC en el paquete.
-      </p>
+    <main className="page recipes-page">
+      <section className="recipes-head">
+        <h2 className="page-title">Cociná sin TACC</h2>
+        <p>
+          Recetas publicadas, con el paso a paso y un lugar cerca para cada ingrediente. Confirmá siempre el sello sin
+          TACC en el paquete.
+        </p>
+      </section>
       <input
         className="search"
         placeholder="Buscar receta o ingrediente…"
@@ -34,7 +36,7 @@ export default function Recetas() {
           <button
             key={item}
             type="button"
-            className={tag === item ? 'tag ok' : 'tag'}
+            className={tag === item ? 'filter active' : 'filter'}
             onClick={() => setTag(item)}
           >
             {item}
