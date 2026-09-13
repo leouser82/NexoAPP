@@ -820,16 +820,52 @@ input[type='range'] {
   border-left: 5px solid var(--blue);
 }
 
-.recipe-card:nth-child(3n + 2) {
+.grid-cards .recipe-card:nth-child(3n + 2) {
   background: linear-gradient(180deg, #fff4ef 0%, #ffffff 42%);
   border-color: #f3d2c6;
   border-left-color: var(--accent);
 }
 
-.recipe-card:nth-child(3n) {
+.grid-cards .recipe-card:nth-child(3n) {
   background: linear-gradient(180deg, #eefaf3 0%, #ffffff 42%);
   border-color: #c7e8d6;
   border-left-color: #2aa36b;
+}
+
+.recipe-feature {
+  display: block;
+  background: linear-gradient(155deg, #073a5c 0%, #0b6ea8 52%, #3cb4e4 100%);
+  color: #f4fbff;
+  border: 0;
+  box-shadow: 0 14px 32px rgba(11, 110, 168, 0.22);
+}
+
+.recipe-feature h4 {
+  color: #fff;
+}
+
+.recipe-feature p {
+  color: #d7f0fb;
+}
+
+.recipe-feature .row-stats {
+  color: #e8f6ff;
+  font-weight: 600;
+}
+
+.recipe-feature .tag {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.recipe-feature-kicker {
+  display: inline-block;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  opacity: 0.85;
+  margin-bottom: 6px;
 }
 
 .recipe-card h4 {
@@ -852,11 +888,11 @@ input[type='range'] {
   font-weight: 600;
 }
 
-.recipe-card:nth-child(3n + 2) .row-stats {
+.grid-cards .recipe-card:nth-child(3n + 2) .row-stats {
   color: #c25b43;
 }
 
-.recipe-card:nth-child(3n) .row-stats {
+.grid-cards .recipe-card:nth-child(3n) .row-stats {
   color: #1f7a52;
 }
 

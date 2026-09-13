@@ -75,11 +75,20 @@ export default function Home() {
         <h3>Una receta para hoy</h3>
         <Link to="/recetas">Ver recetas</Link>
       </div>
-      <Link className="card recipe-card" to={`/recetas/${featured.id}`}>
+      <Link className="card recipe-feature" to={`/recetas/${featured.id}`}>
+        <span className="recipe-feature-kicker">Receta de {featured.sourceName}</span>
         <h4>{featured.title}</h4>
         <p>{featured.summary}</p>
-        <div className="row-stats">
+        <div className="tags">
+          {featured.tags.map((item) => (
+            <span className="tag" key={item}>
+              {item}
+            </span>
+          ))}
+        </div>
+        <div className="row-stats" style={{ marginTop: 10 }}>
           <span>{featured.minutes} min</span>
+          <span>{featured.servings} porciones</span>
           <span>{featured.difficulty}</span>
         </div>
       </Link>
