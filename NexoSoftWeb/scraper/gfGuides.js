@@ -2,9 +2,8 @@ import { fetchJson } from './http.js'
 import { dedupe, readCache, writeCache } from './store.js'
 
 /**
- * Dev twin of public/gf-guides.php: CeliMap does not allow browser requests,
- * so both environments answer the same path with the same raw payload and the
- * app does the rest.
+ * Dev twin of SinGlutenLife/frontend/public/gf-guides.php: CeliMap does not
+ * allow browser requests, so both environments answer the same path.
  */
 
 const CELIMAP_API = 'https://www.celimap.com.ar/api/places'

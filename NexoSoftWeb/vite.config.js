@@ -62,15 +62,29 @@ function sglPreviewSpaFallback(req, res, next) {
   next()
 }
 
+function sglApiPath(raw) {
+  const pathName = (raw || '').split('?')[0]
+  return pathName.startsWith(SGL_BASE) ? pathName.slice(SGL_BASE.length - 1) : pathName
+}
+
+function syncSglPhp() {
+  const names = ['gf-guides.php', 'place-reviews.php', 'place-info.php']
+  for (const name of names) {
+    const from = path.join(SGL_ROOT, 'public', name)
+    const to = path.join(__dirname, 'public', name)
+    if (fs.existsSync(from)) fs.copyFileSync(from, to)
+  }
+}
+
 function placeInfoEndpoint() {
   return {
     name: 'place-info-endpoint',
     configureServer(server) {
+      syncSglPhp()
       server.middlewares.use(async (req, res, next) => {
-        const pathName = (req.url || '').split('?')[0]
+        const pathName = sglApiPath(req.url || '')
         const isInfo = pathName === '/place-info.php' || pathName === '/api/place-info'
         const isPhoto = pathName === '/api/place-photo'
-        // Same path as production, where it is served by public/gf-guides.php.
         const isGuides = pathName === '/gf-guides.php'
         const isReviews = pathName === '/place-reviews.php' || pathName === '/api/place-reviews'
         if (!isInfo && !isPhoto && !isGuides && !isReviews) {
@@ -180,6 +194,7 @@ function embedSinGlutenLife() {
       sequential: true,
       order: 'post',
       async handler() {
+        syncSglPhp()
         const outDir = path.resolve(__dirname, 'dist/singluten')
         await viteBuild(
           sglInlineConfig({
