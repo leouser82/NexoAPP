@@ -11,7 +11,7 @@ export const SITE = {
   ogLocale: 'es_LA',
 }
 
-export const APP_URL = '/singluten/'
+export const APP_URL = 'https://singlutenlife.site/'
 
 export const META = {
   title: 'Nexo Studio | Sitios web y sistemas simples para tu negocio',
