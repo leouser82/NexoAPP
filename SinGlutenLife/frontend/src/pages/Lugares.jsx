@@ -24,7 +24,6 @@ export default function Lugares() {
   }, [places, q, filter, onlyDedicated])
 
   const dedicated = useMemo(() => places.filter((p) => p.level === 'dedicado').length, [places])
-  const guides = useMemo(() => [...new Set(places.flatMap((p) => p.guides || []))], [places])
 
   return (
     <main className="page">
@@ -42,12 +41,12 @@ export default function Lugares() {
       <h2 className="page-title">¿Dónde comemos hoy?</h2>
       <p className="note" style={{ margin: '0 0 14px' }}>
         {places.length
-          ? `${places.length} lugares en las guías a menos de 25 km, ${dedicated} con cocina 100% libre de gluten. Datos de ${guides.join(', ') || 'CeliMap y SinTaccto'}. Confirmá siempre el protocolo en el local.`
-          : 'Solo mostramos lugares que figuran en CeliMap o SinTaccto. Si no está en esas listas, acá no aparece.'}
+          ? `${places.length} lugares publicados a menos de 25 km, ${dedicated} con cocina 100% libre de gluten. Confirmá siempre el protocolo en el local.`
+          : 'Solo mostramos locales ya publicados como sin TACC. Si no está en esas listas, acá no lo inventamos.'}
       </p>
       {placesStatus === 'ready' && places.length > 0 && places.length < 12 ? (
         <p className="banner-proto">
-          Poca cobertura en esta zona: las guías publican {places.length} locales. No inventamos el resto.
+          Poca cobertura en esta zona: hay {places.length} locales publicados. No inventamos el resto.
           Probá otra ciudad.
         </p>
       ) : null}
@@ -77,10 +76,10 @@ export default function Lugares() {
           <PlaceCard key={p.id} place={p} />
         ))}
       </div>
-      {placesStatus === 'loading' && <p className="note">Cargando las guías…</p>}
+      {placesStatus === 'loading' && <p className="note">Cargando locales…</p>}
       {placesStatus === 'ready' && places.length === 0 && (
         <p className="note">
-          Las guías no listan locales a 25 km de {label}. Elegí una ciudad arriba o{' '}
+          No hay locales publicados a 25 km de {label}. Elegí una ciudad arriba o{' '}
           <button type="button" className="text-btn" onClick={locate}>
             usá el GPS
           </button>

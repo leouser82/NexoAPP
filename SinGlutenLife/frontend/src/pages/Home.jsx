@@ -18,11 +18,12 @@ export default function Home() {
   return (
     <main className="page">
       <section className="hero">
-        <div className="hero-kicker">Guías sin TACC, cerca tuyo</div>
+        <div className="hero-kicker">Cerca · En casa · Sin TACC</div>
         <h2>Hola, hoy la mesa está de tu lado.</h2>
         <p>
-          Solo locales que ya figuran en CeliMap o SinTaccto. No es una certificación: confirmá el
-          protocolo en el lugar. También hay recetas publicadas y dónde comprar cada ingrediente.
+          Encontrá dónde sentarte cerca y, si te quedás en casa, hay receta nueva todos los días — con
+          dónde comprar lo que falta. En el local preguntá igual: esto no reemplaza el protocolo del
+          lugar.
         </p>
         <div className="hero-actions">
           <Link className="btn btn-light" to="/lugares">
@@ -39,8 +40,8 @@ export default function Home() {
       </section>
 
       <p className="trust-line">
-        Juntamos dos guías para no mostrar un restaurante cualquiera. Si un local no está en esas
-        listas, acá no aparece.
+        No adivinamos si un lugar es seguro. Solo aparecen locales ya publicados como sin TACC. En el
+        mostrador, confirmá igual.
       </p>
 
       <div className="section-head">
@@ -79,14 +80,14 @@ export default function Home() {
       ) : null}
       {thinCoverage ? (
         <p className="banner-proto">
-          En esta zona las guías publican {places.length} locales. Eso no significa que no haya más:
-          significa que no están en CeliMap o SinTaccto. Podés mirar otra ciudad.
+          En esta zona hay {places.length} locales publicados. Eso no significa que no haya más:
+          todavía no los tenemos cargados. Podés mirar otra ciudad.
         </p>
       ) : null}
       {placesStatus === 'ready' && places.length === 0 ? (
         <p className="banner-proto">
-          Las guías no tienen locales publicados a menos de 25 km. Elegí una ciudad con más cobertura
-          o actualizá el GPS.
+          No hay locales publicados a menos de 25 km. Elegí una ciudad con más cobertura o actualizá el
+          GPS.
         </p>
       ) : null}
       <p className="note" style={{ marginBottom: 8 }}>
@@ -117,7 +118,7 @@ export default function Home() {
           <PlaceCard place={nearest} />
         </>
       ) : waitingPlaces ? (
-        <p className="note">Estamos leyendo las guías cerca de tu zona…</p>
+        <p className="note">Estamos buscando locales cerca de tu zona…</p>
       ) : null}
 
       <div className="section-head">
@@ -125,7 +126,8 @@ export default function Home() {
         <Link to="/recetas">{recipes.length} recetas</Link>
       </div>
       <p className="note" style={{ marginTop: 0 }}>
-        Cada receta tiene fuente. En la ficha te sugerimos un comercio cerca para cada ingrediente.
+        Cada día hay una distinta. En la ficha, el paso a paso y un comercio cerca para cada
+        ingrediente.
       </p>
     </main>
   )

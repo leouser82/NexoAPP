@@ -22,8 +22,8 @@ export default function Recetas() {
       <section className="recipes-head">
         <h2 className="page-title">Cociná sin TACC</h2>
         <p>
-          Recetas publicadas, con el paso a paso y un lugar cerca para cada ingrediente. Confirmá siempre el sello sin
-          TACC en el paquete.
+          Recetas publicadas de varias fuentes, con el paso a paso y un lugar cerca para cada
+          ingrediente. Hay una distinta cada día. Confirmá siempre el sello sin TACC en el paquete.
         </p>
       </section>
       <input
