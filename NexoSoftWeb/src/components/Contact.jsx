@@ -1,13 +1,8 @@
-import { useState } from 'react'
-import { CONTACT, NEED_OPTIONS, SITE } from '../content'
+import { useEffect, useState } from 'react'
+import { SITE } from '../content'
+import { useCopy } from '../i18n/LanguageContext.jsx'
 
 const MAILBOX = SITE.email
-const EMPTY_FORM = {
-  name: '',
-  email: '',
-  need: NEED_OPTIONS[0],
-  message: '',
-}
 
 async function sendBriefing(fields) {
   const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(MAILBOX)}`, {
@@ -32,10 +27,21 @@ async function sendBriefing(fields) {
   return { response, data }
 }
 
+function fill(template, email) {
+  return String(template || '').replaceAll('{email}', email)
+}
+
 export default function Contact() {
-  const [form, setField] = useState(EMPTY_FORM)
+  const { copy, lang } = useCopy()
+  const contact = copy.contact
+  const needOptions = copy.needOptions
+  const [form, setField] = useState({ name: '', email: '', need: needOptions[0], message: '' })
   const [status, setStatus] = useState('')
   const [sending, setSending] = useState(false)
+
+  useEffect(() => {
+    setField((current) => ({ ...current, need: needOptions[0] }))
+  }, [lang, needOptions])
 
   function onChange(event) {
     const { name, value } = event.target
@@ -45,7 +51,7 @@ export default function Contact() {
   async function onSubmit(event) {
     event.preventDefault()
     setSending(true)
-    setStatus(CONTACT.sending)
+    setStatus(contact.sending)
 
     try {
       const { response, data } = await sendBriefing(form)
@@ -53,7 +59,7 @@ export default function Contact() {
       const failed = String(data.success) === 'false'
 
       if (failed && /activate|confirm|email|web server/i.test(message)) {
-        setStatus(CONTACT.activate)
+        setStatus(fill(contact.activate, MAILBOX))
         return
       }
 
@@ -61,10 +67,10 @@ export default function Contact() {
         throw new Error(message || 'send-failed')
       }
 
-      setField(EMPTY_FORM)
-      setStatus(CONTACT.sent)
+      setField({ name: '', email: '', need: needOptions[0], message: '' })
+      setStatus(fill(contact.sent, MAILBOX))
     } catch {
-      setStatus(CONTACT.fail)
+      setStatus(fill(contact.fail, MAILBOX))
     } finally {
       setSending(false)
     }
@@ -73,58 +79,58 @@ export default function Contact() {
   return (
     <section id="contacto" className="contact">
       <div>
-        <p className="kicker">{CONTACT.kicker}</p>
-        <h2>{CONTACT.title}</h2>
-        <p>{CONTACT.lead}</p>
+        <p className="kicker">{contact.kicker}</p>
+        <h2>{contact.title}</h2>
+        <p>{contact.lead}</p>
         <p className="slots">
-          {CONTACT.slotsBefore}
-          <strong>{CONTACT.slotsStrong}</strong>
+          {contact.slotsBefore}
+          <strong>{contact.slotsStrong}</strong>
         </p>
       </div>
       <form onSubmit={onSubmit} autoComplete="on">
         <label>
-          {CONTACT.name}
+          {contact.name}
           <input
             name="name"
             required
             autoComplete="name"
-            placeholder={CONTACT.namePlaceholder}
+            placeholder={contact.namePlaceholder}
             value={form.name}
             onChange={onChange}
           />
         </label>
         <label>
-          {CONTACT.email}
+          {contact.email}
           <input
             name="email"
             type="email"
             required
             autoComplete="email"
-            placeholder={CONTACT.emailPlaceholder}
+            placeholder={contact.emailPlaceholder}
             value={form.email}
             onChange={onChange}
           />
         </label>
         <label>
-          {CONTACT.need}
+          {contact.need}
           <select name="need" value={form.need} onChange={onChange}>
-            {NEED_OPTIONS.map((option) => (
+            {needOptions.map((option) => (
               <option key={option}>{option}</option>
             ))}
           </select>
         </label>
         <label>
-          {CONTACT.message}
+          {contact.message}
           <textarea
             name="message"
             rows="4"
-            placeholder={CONTACT.messagePlaceholder}
+            placeholder={contact.messagePlaceholder}
             value={form.message}
             onChange={onChange}
           />
         </label>
         <button className="btn primary" type="submit" disabled={sending}>
-          {sending ? CONTACT.sending : CONTACT.submit}
+          {sending ? contact.sending : contact.submit}
         </button>
         {status ? <p className="form-note">{status}</p> : null}
       </form>

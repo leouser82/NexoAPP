@@ -1,14 +1,15 @@
-import { PROCESS_INTRO, STEPS } from '../content'
+import { useCopy } from '../i18n/LanguageContext.jsx'
 
 export default function Process() {
+  const { copy } = useCopy()
   return (
     <section id="proceso" className="process">
       <div className="section-head">
-        <p className="kicker">{PROCESS_INTRO.kicker}</p>
-        <h2>{PROCESS_INTRO.title}</h2>
+        <p className="kicker">{copy.processIntro.kicker}</p>
+        <h2>{copy.processIntro.title}</h2>
       </div>
       <ol>
-        {STEPS.map((step) => (
+        {copy.steps.map((step) => (
           <li key={step.title}>
             <h3>{step.title}</h3>
             <p>{step.text}</p>

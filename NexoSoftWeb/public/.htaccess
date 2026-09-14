@@ -3,8 +3,5 @@ RewriteEngine On
 RewriteRule ^api/place-info$ /place-info.php [L,QSA]
 RewriteRule ^api/place-photo$ /place-info.php [L,QSA]
 RewriteRule ^api/place-reviews$ /place-reviews.php [L,QSA]
-RewriteRule ^singluten$ /singluten/ [R=302,L]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^singluten/(.*)$ /singluten/index.html [L]
+RewriteRule ^singluten(?:/(.*))?$ https://singlutenlife.site/$1 [R=301,L]
 

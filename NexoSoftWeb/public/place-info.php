@@ -1,4 +1,8 @@
 <?php
+/**
+ * SinGluten Life — datos extra de un local (Hostinger).
+ * Fuente de este archivo: este proyecto, no Nexo Studio.
+ */
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 

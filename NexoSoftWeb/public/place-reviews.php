@@ -1,7 +1,9 @@
 <?php
 /**
- * Opiniones de un solo lugar, para la ficha. La lista no llama esto.
- * CeliMap ya trae el puntaje de Google; los textos, si los tiene.
+ * SinGluten Life — opiniones de un lugar (Hostinger).
+ * Fuente de este archivo: este proyecto, no Nexo Studio.
+ *
+ * La lista no llama esto. CeliMap ya trae el puntaje de Google; los textos, si los tiene.
  */
 
 header('Content-Type: application/json; charset=utf-8');

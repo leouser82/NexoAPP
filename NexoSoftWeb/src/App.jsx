@@ -8,10 +8,11 @@ import Proof from './components/Proof.jsx'
 import Quote from './components/Quote.jsx'
 import Services from './components/Services.jsx'
 import Work from './components/Work.jsx'
+import { LanguageProvider } from './i18n/LanguageContext.jsx'
 
 export default function App() {
   return (
-    <>
+    <LanguageProvider>
       <Background />
       <Header />
       <main id="top">
@@ -24,6 +25,6 @@ export default function App() {
         <Contact />
       </main>
       <Footer />
-    </>
+    </LanguageProvider>
   )
 }

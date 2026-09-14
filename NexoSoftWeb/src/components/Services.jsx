@@ -1,14 +1,15 @@
-import { SERVICES, SERVICES_INTRO } from '../content'
+import { useCopy } from '../i18n/LanguageContext.jsx'
 
 export default function Services() {
+  const { copy } = useCopy()
   return (
     <section id="servicios" className="services">
       <div className="section-head">
-        <p className="kicker">{SERVICES_INTRO.kicker}</p>
-        <h2>{SERVICES_INTRO.title}</h2>
+        <p className="kicker">{copy.servicesIntro.kicker}</p>
+        <h2>{copy.servicesIntro.title}</h2>
       </div>
       <div className="service-grid">
-        {SERVICES.map((service) => (
+        {copy.services.map((service) => (
           <article key={service.id} className={service.tall ? 'card tall' : 'card'}>
             <span>{service.id}</span>
             <h3>{service.title}</h3>

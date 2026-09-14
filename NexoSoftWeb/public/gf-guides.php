@@ -1,6 +1,7 @@
 <?php
 /**
- * Proxy de la guia CeliMap para produccion (Hostinger).
+ * SinGluten Life — proxy de CeliMap (Hostinger).
+ * Fuente de este archivo: este proyecto, no Nexo Studio.
  *
  * El navegador no puede pedirle los datos directo porque la API no habilita
  * CORS. Este script los baja una vez por dia, los guarda en disco y los

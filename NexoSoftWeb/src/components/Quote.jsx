@@ -1,14 +1,16 @@
-import { QUOTE } from '../content'
+import { useCopy } from '../i18n/LanguageContext.jsx'
 
 export default function Quote() {
+  const { copy } = useCopy()
+  const quote = copy.quote
   return (
     <section className="quote">
       <blockquote>
-        {QUOTE.textBefore}
-        <em>{QUOTE.textAccent}</em>
-        {QUOTE.textAfter}
+        {quote.textBefore}
+        <em>{quote.textAccent}</em>
+        {quote.textAfter}
       </blockquote>
-      <p>{QUOTE.note}</p>
+      <p>{quote.note}</p>
     </section>
   )
 }
