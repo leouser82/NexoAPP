@@ -1,13 +1,13 @@
 const es = {
-  proofAria: 'Por qué Nexo Studio',
+  proofAria: 'Por qué Nexo Soft',
   meta: {
-    title: 'Nexo Studio | Sitios web y sistemas simples para tu negocio',
+    title: 'Nexo Soft | Sitios web y sistemas simples para tu negocio',
     description:
       'Diseñamos sitios web y sistemas fáciles de usar. Los publicamos en nuestro hosting y te los entregamos listos. Sin jerga técnica: tú vendes, nosotros nos ocupamos de internet.',
   },
   nav: { services: 'Qué incluye', work: 'Ejemplos', process: 'Cómo funciona', start: 'Empezar' },
   hero: {
-    kicker: 'Sitios web y sistemas · Hosting propio · Hecho con IA',
+    kicker: 'Sitios web y sistemas · Hosting propio',
     titleBefore: 'Tu negocio, en internet.',
     titleAccent: 'Fácil de entender.',
     lede: 'Diseñamos el sitio o el sistema que tu negocio necesita. Se ve profesional, se entiende de inmediato y queda publicado en nuestro hosting. Tú te ocupas de vender; nosotros, de que internet trabaje para ti.',
@@ -15,10 +15,10 @@ const es = {
     secondary: 'Cómo trabajamos',
     imageAlt: 'Escritorio de un estudio digital con una laptop y luz azul',
   },
-  marquee: ['Hosting propio', 'Hecho con IA', 'Sitio listo para usar', 'Lo explicamos con claridad', 'Se ve profesional'],
+  marquee: ['Hosting propio', 'Sitio listo para usar', 'Lo explicamos con claridad', 'Se ve profesional'],
   proof: [
     { id: '01', text: 'Hosting propio: tu sitio vive en nuestros servidores. No tienes que ocuparte de dominios, paneles ni de cómo publicarlo.' },
-    { id: '02', text: 'Usamos herramientas actuales e inteligencia artificial en el desarrollo. Más rápido, más ordenado, con revisión humana al final.' },
+    { id: '02', text: 'Usamos herramientas actuales en el desarrollo. Más rápido, más ordenado, con revisión al final.' },
     { id: '03', text: 'Lo entregamos funcionando: el enlace, cómo usarlo y qué hacer cada día. Sin manuales largos.' },
   ],
   servicesIntro: { kicker: 'Qué incluye', title: 'Un sistema web pensado para quien tiene un negocio.' },
@@ -50,7 +50,7 @@ const es = {
     { title: 'Hablamos', text: 'En una llamada corta nos cuentas tu negocio: a quién le vendes y qué necesitas que haga el sitio.' },
     { title: 'Ves el plan', text: 'Qué vas a recibir, cómo es el camino y cuánto tarda. Lo ves claro antes de empezar.' },
     { title: 'Ves cómo queda', text: 'Diseñamos la cara del sitio y te la mostramos. Ajustamos juntos hasta que digas “así”.' },
-    { title: 'Lo construimos', text: 'Armamos el sistema con herramientas actuales e IA, y te mostramos avances reales.' },
+    { title: 'Lo construimos', text: 'Armamos el sistema con herramientas actuales y te mostramos avances reales.' },
     { title: 'Lo recibes en internet', text: 'Lo publicamos en nuestro hosting, te damos el acceso y te explicamos cómo usarlo. Ya es tuyo.' },
   ],
   quote: {
@@ -86,20 +86,20 @@ const es = {
     'Quiero hablar primero',
   ],
   footer: {
-    legal: '© 2026 Nexo Studio · Sitios web y sistemas con hosting propio',
+    legal: '© 2026 Nexo Soft · Sitios web y sistemas con hosting propio',
     note: 'Se ve bien en la computadora. También en el teléfono.',
   },
 }
 
 const en = {
-  proofAria: 'Why Nexo Studio',
+  proofAria: 'Why Nexo Soft',
   meta: {
-    title: 'Nexo Studio | Simple websites and systems for your business',
+    title: 'Nexo Soft | Simple websites and systems for your business',
     description: 'We design easy-to-use websites and systems. We publish them on our hosting and hand them over ready. No jargon: you sell, we take care of the internet.',
   },
   nav: { services: 'What’s included', work: 'Work', process: 'How it works', start: 'Start' },
   hero: {
-    kicker: 'Websites and systems · Own hosting · Built with AI',
+    kicker: 'Websites and systems · Own hosting',
     titleBefore: 'Your business, online.',
     titleAccent: 'Easy to understand.',
     lede: 'We design the site or system your business needs. It looks professional, makes sense at once, and goes live on our hosting. You sell; we make the internet work for you.',
@@ -107,10 +107,10 @@ const en = {
     secondary: 'How we work',
     imageAlt: 'A digital studio desk with a laptop and blue light',
   },
-  marquee: ['Own hosting', 'Built with AI', 'Ready to use', 'We explain it clearly', 'It looks professional'],
+  marquee: ['Own hosting', 'Ready to use', 'We explain it clearly', 'It looks professional'],
   proof: [
     { id: '01', text: 'Own hosting: your site lives on our servers. You don’t have to deal with domains, panels, or how to publish it.' },
-    { id: '02', text: 'We use current tools and AI in the build. Faster, tidier, with a human review at the end.' },
+    { id: '02', text: 'We use current tools in the build. Faster, tidier, with a review at the end.' },
     { id: '03', text: 'We hand it over working: the link, how to use it, and what to do each day. No endless manuals.' },
   ],
   servicesIntro: { kicker: 'What’s included', title: 'A web system made for someone who runs a business.' },
@@ -142,7 +142,7 @@ const en = {
     { title: 'We talk', text: 'On a short call you tell us your business: who you sell to and what the site needs to do.' },
     { title: 'You see the plan', text: 'What you get, the path, and how long it takes. Clear before we start.' },
     { title: 'You see how it looks', text: 'We design the face of the site and show it to you. We adjust together until you say “that’s it”.' },
-    { title: 'We build it', text: 'We assemble the system with current tools and AI, and show you real progress.' },
+    { title: 'We build it', text: 'We assemble the system with current tools, and show you real progress.' },
     { title: 'You receive it online', text: 'We publish it on our hosting, give you access, and explain how to use it. It is yours.' },
   ],
   quote: {
@@ -178,20 +178,20 @@ const en = {
     'I want to talk first',
   ],
   footer: {
-    legal: '© 2026 Nexo Studio · Websites and systems with own hosting',
+    legal: '© 2026 Nexo Soft · Websites and systems with own hosting',
     note: 'It looks good on a computer. On a phone too.',
   },
 }
 
 const it = {
-  proofAria: 'Perché Nexo Studio',
+  proofAria: 'Perché Nexo Soft',
   meta: {
-    title: 'Nexo Studio | Siti e sistemi semplici per il tuo business',
+    title: 'Nexo Soft | Siti e sistemi semplici per il tuo business',
     description: 'Progettiamo siti e sistemi facili da usare. Li pubblichiamo sul nostro hosting e te li consegnamo pronti. Senza gergo: tu vendi, di internet ci occupiamo noi.',
   },
   nav: { services: 'Cosa include', work: 'Esempi', process: 'Come funziona', start: 'Inizia' },
   hero: {
-    kicker: 'Siti e sistemi · Hosting proprio · Fatto con IA',
+    kicker: 'Siti e sistemi · Hosting proprio',
     titleBefore: 'Il tuo business, online.',
     titleAccent: 'Facile da capire.',
     lede: 'Progettiamo il sito o il sistema di cui hai bisogno. Sembra professionale, si capisce subito e va online sul nostro hosting. Tu vendi; noi facciamo lavorare internet per te.',
@@ -199,10 +199,10 @@ const it = {
     secondary: 'Come lavoriamo',
     imageAlt: 'Scrivania di uno studio digitale con un laptop e luce blu',
   },
-  marquee: ['Hosting proprio', 'Fatto con IA', 'Pronto da usare', 'Lo spieghiamo chiaro', 'Sembra professionale'],
+  marquee: ['Hosting proprio', 'Pronto da usare', 'Lo spieghiamo chiaro', 'Sembra professionale'],
   proof: [
     { id: '01', text: 'Hosting proprio: il sito vive sui nostri server. Non devi occuparti di domini, pannelli o di come pubblicarlo.' },
-    { id: '02', text: 'Usiamo strumenti attuali e IA nello sviluppo. Più veloce, più ordinato, con revisione umana alla fine.' },
+    { id: '02', text: 'Usiamo strumenti attuali nello sviluppo. Più veloce, più ordinato, con revisione alla fine.' },
     { id: '03', text: 'Te lo consegniamo funzionante: il link, come usarlo e cosa fare ogni giorno. Senza manuali infiniti.' },
   ],
   servicesIntro: { kicker: 'Cosa include', title: 'Un sistema web pensato per chi ha un’attività.' },
@@ -234,7 +234,7 @@ const it = {
     { title: 'Parliamo', text: 'In una chiamata breve ci racconti l’attività: a chi vendi e cosa deve fare il sito.' },
     { title: 'Vedi il piano', text: 'Cosa ricevi, il percorso e quanto ci vuole. Chiaro prima di iniziare.' },
     { title: 'Vedi come viene', text: 'Disegniamo il volto del sito e te lo mostriamo. Aggiustiamo insieme finché dici “così”.' },
-    { title: 'Lo costruiamo', text: 'Montiamo il sistema con strumenti attuali e IA, e ti mostriamo progressi veri.' },
+    { title: 'Lo costruiamo', text: 'Montiamo il sistema con strumenti attuali e ti mostriamo progressi veri.' },
     { title: 'Lo ricevi in rete', text: 'Lo pubblichiamo sul nostro hosting, ti diamo l’accesso e ti spieghiamo come usarlo. È tuo.' },
   ],
   quote: {
@@ -270,20 +270,20 @@ const it = {
     'Voglio parlare prima',
   ],
   footer: {
-    legal: '© 2026 Nexo Studio · Siti e sistemi con hosting proprio',
+    legal: '© 2026 Nexo Soft · Siti e sistemi con hosting proprio',
     note: 'Si vede bene sul computer. Anche sul telefono.',
   },
 }
 
 const fr = {
-  proofAria: 'Pourquoi Nexo Studio',
+  proofAria: 'Pourquoi Nexo Soft',
   meta: {
-    title: 'Nexo Studio | Sites et systèmes simples pour votre activité',
+    title: 'Nexo Soft | Sites et systèmes simples pour votre activité',
     description: 'Nous concevons des sites et des systèmes faciles à utiliser. Nous les publions sur notre hébergement et vous les remettons prêts. Sans jargon : vous vendez, nous nous occupons d’internet.',
   },
   nav: { services: 'Ce qui est inclus', work: 'Exemples', process: 'Comment ça marche', start: 'Commencer' },
   hero: {
-    kicker: 'Sites et systèmes · Hébergement propre · Fait avec l’IA',
+    kicker: 'Sites et systèmes · Hébergement propre',
     titleBefore: 'Votre activité, en ligne.',
     titleAccent: 'Facile à comprendre.',
     lede: 'Nous concevons le site ou le système dont vous avez besoin. Il a l’air professionnel, se comprend tout de suite et est publié sur notre hébergement. Vous vendez ; nous faisons travailler internet pour vous.',
@@ -291,10 +291,10 @@ const fr = {
     secondary: 'Comment nous travaillons',
     imageAlt: 'Bureau d’un studio digital avec un laptop et une lumière bleue',
   },
-  marquee: ['Hébergement propre', 'Fait avec l’IA', 'Prêt à l’emploi', 'On l’explique clairement', 'Ça a l’air pro'],
+  marquee: ['Hébergement propre', 'Prêt à l’emploi', 'On l’explique clairement', 'Ça a l’air pro'],
   proof: [
     { id: '01', text: 'Hébergement propre : votre site vit sur nos serveurs. Vous n’avez pas à vous occuper des domaines, des panneaux ni de la mise en ligne.' },
-    { id: '02', text: 'Nous utilisons des outils actuels et l’IA. Plus rapide, plus net, avec une relecture humaine à la fin.' },
+    { id: '02', text: 'Nous utilisons des outils actuels. Plus rapide, plus net, avec une relecture à la fin.' },
     { id: '03', text: 'Nous le remettons en état de marche : le lien, comment l’utiliser et quoi faire chaque jour. Pas de manuels interminables.' },
   ],
   servicesIntro: { kicker: 'Ce qui est inclus', title: 'Un système web pensé pour qui a une activité.' },
@@ -326,7 +326,7 @@ const fr = {
     { title: 'On parle', text: 'Lors d’un court appel, vous nous racontez l’activité : à qui vous vendez et ce que le site doit faire.' },
     { title: 'Vous voyez le plan', text: 'Ce que vous recevez, le chemin et le délai. Clair avant de commencer.' },
     { title: 'Vous voyez le rendu', text: 'Nous dessinons le visage du site et vous le montrons. On ajuste ensemble jusqu’à « c’est ça ».' },
-    { title: 'Nous le construisons', text: 'Nous montons le système avec des outils actuels et l’IA, et vous montrons de vrais avancées.' },
+    { title: 'Nous le construisons', text: 'Nous montons le système avec des outils actuels, et vous montrons de vrais avancées.' },
     { title: 'Vous le recevez en ligne', text: 'Nous le publions sur notre hébergement, vous donnons l’accès et expliquons comment l’utiliser. C’est le vôtre.' },
   ],
   quote: {
@@ -362,20 +362,20 @@ const fr = {
     'Je veux d’abord en parler',
   ],
   footer: {
-    legal: '© 2026 Nexo Studio · Sites et systèmes avec hébergement propre',
+    legal: '© 2026 Nexo Soft · Sites et systèmes avec hébergement propre',
     note: 'Ça se voit bien sur ordinateur. Aussi sur téléphone.',
   },
 }
 
 const gl = {
-  proofAria: 'Por que Nexo Studio',
+  proofAria: 'Por que Nexo Soft',
   meta: {
-    title: 'Nexo Studio | Sitios web e sistemas simples para o teu negocio',
+    title: 'Nexo Soft | Sitios web e sistemas simples para o teu negocio',
     description: 'Deseñamos sitios e sistemas fáciles de usar. Publícamolos no noso hosting e entregámolos listos. Sen xerga: ti vendes, nós ocupámonos de internet.',
   },
   nav: { services: 'Que inclui', work: 'Exemplos', process: 'Como funciona', start: 'Comezar' },
   hero: {
-    kicker: 'Sitios e sistemas · Hosting propio · Feito con IA',
+    kicker: 'Sitios e sistemas · Hosting propio',
     titleBefore: 'O teu negocio, en internet.',
     titleAccent: 'Fácil de entender.',
     lede: 'Deseñamos o sitio ou o sistema que o teu negocio precisa. Véese profesional, enténdese de seguido e queda publicado no noso hosting. Ti ocupas de vender; nós, de que internet traballe para ti.',
@@ -383,10 +383,10 @@ const gl = {
     secondary: 'Como traballamos',
     imageAlt: 'Escritorio dun estudo dixital cunha portátil e luz azul',
   },
-  marquee: ['Hosting propio', 'Feito con IA', 'Listo para usar', 'Explicámolo con claridade', 'Véese profesional'],
+  marquee: ['Hosting propio', 'Listo para usar', 'Explicámolo con claridade', 'Véese profesional'],
   proof: [
     { id: '01', text: 'Hosting propio: o teu sitio vive nos nosos servidores. Non tes que ocuparte de dominios, paneis nin de como publicalo.' },
-    { id: '02', text: 'Usamos ferramentas actuais e intelixencia artificial. Máis rápido, máis ordenado, cunha revisión humana ao final.' },
+    { id: '02', text: 'Usamos ferramentas actuais. Máis rápido, máis ordenado, cunha revisión ao final.' },
     { id: '03', text: 'Entregámolo funcionando: a ligazón, como usalo e que facer cada día. Sen manuais eternos.' },
   ],
   servicesIntro: { kicker: 'Que inclui', title: 'Un sistema web pensado para quen ten un negocio.' },
@@ -418,7 +418,7 @@ const gl = {
     { title: 'Falamos', text: 'Nunha chamada curta cóntasnos o negocio: a quen lle vendes e que precisa que faga o sitio.' },
     { title: 'Ves o plan', text: 'Que vas recibir, como é o camiño e canto tarda. Velo claro antes de comezar.' },
     { title: 'Ves como queda', text: 'Deseñamos a cara do sitio e amosámola. Axustamos xuntos ata que digas “así”.' },
-    { title: 'Construímolo', text: 'Montamos o sistema con ferramentas actuais e IA, e amosamos avances reais.' },
+    { title: 'Construímolo', text: 'Montamos o sistema con ferramentas actuais e amosamos avances reais.' },
     { title: 'Recíbelo en internet', text: 'Publicámolo no noso hosting, dámosche o acceso e explicamos como usalo. Xa é teu.' },
   ],
   quote: {
@@ -454,7 +454,7 @@ const gl = {
     'Quero falar primeiro',
   ],
   footer: {
-    legal: '© 2026 Nexo Studio · Sitios web e sistemas con hosting propio',
+    legal: '© 2026 Nexo Soft · Sitios web e sistemas con hosting propio',
     note: 'Véese ben no computador. Tamén no teléfono.',
   },
 }

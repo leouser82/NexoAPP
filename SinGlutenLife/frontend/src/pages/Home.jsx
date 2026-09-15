@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import AreaChips from '../components/AreaChips.jsx'
 import PlaceCard from '../components/PlaceCard.jsx'
+import RecipeCard from '../components/RecipeCard.jsx'
 import RecipePhoto from '../components/RecipePhoto.jsx'
-import { recipeOfTheDay, recipes } from '../data/recipes.js'
+import { useCommunity } from '../community/CommunityContext.jsx'
+import { recipeOfTheDay } from '../data/recipes.js'
 import { isOpenNow } from '../geo/guideHours.js'
 import { useLocationData } from '../geo/LocationContext.jsx'
 import { useI18n } from '../i18n/LanguageContext.jsx'
@@ -12,6 +14,7 @@ import T from '../i18n/T.jsx'
 export default function Home() {
   const { places, placesStatus, label, status, locate, source, error } = useLocationData()
   const { t } = useI18n()
+  const { allRecipes, community } = useCommunity()
   const nearby = [...places].sort((a, b) => a.distanceKm - b.distanceKm)
   const nearest = nearby[0]
   const daily = recipeOfTheDay()
@@ -111,11 +114,24 @@ export default function Home() {
 
       <div className="section-head">
         <h3>{t('home.cookHome')}</h3>
-        <Link to="/recetas">{t('home.nRecipes', { n: recipes.length })}</Link>
+        <Link to="/recetas">{t('home.nRecipes', { n: allRecipes.length })}</Link>
       </div>
       <p className="note" style={{ marginTop: 0 }}>
         {t('home.cookNote')}
       </p>
+      <Link className="cook-banner" to="/recetas/nueva">
+        <span className="cook-kicker">{t('cook.bannerKicker')}</span>
+        <strong>{t('cook.bannerTitle')}</strong>
+        <p>{t('cook.bannerBody')}</p>
+        <span className="cook-banner-cta">{t('cook.cta')}</span>
+      </Link>
+      {community.length ? (
+        <div className="grid-cards home-cook-grid">
+          {community.slice(0, 2).map((recipe) => (
+            <RecipeCard key={recipe.id} recipe={recipe} />
+          ))}
+        </div>
+      ) : null}
     </main>
   )
 }

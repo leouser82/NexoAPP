@@ -9,7 +9,7 @@ export default function Header() {
     <header className="nav">
       <a className="logo" href="#top">
         <img src="/assets/favicon.png" alt="" width="36" height="36" />
-        nexo<span>studio</span>
+        nexo<span>soft</span>
         <span className="sr-only">{SITE.name}</span>
       </a>
       <div className="nav-end">

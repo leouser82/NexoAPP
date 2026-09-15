@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
+import { communityMiddleware } from '../SinGlutenLife/frontend/communityDev.js'
 import { lookupPhoto, lookupPlace } from './placeInfo.js'
 import { celimapRaw } from './scraper/gfGuides.js'
 import { lookupReviews } from './scraper/googleReviews.js'
@@ -31,7 +32,15 @@ function sglInlineConfig(extra = {}) {
     root: SGL_ROOT,
     base: SGL_BASE,
     appType: 'spa',
-    plugins: [react()],
+    plugins: [
+      react(),
+      {
+        name: 'community-recipes-endpoint',
+        configureServer(server) {
+          server.middlewares.use(communityMiddleware())
+        },
+      },
+    ],
     resolve: {
       alias: {
         react: pkg('react'),
@@ -68,11 +77,20 @@ function sglApiPath(raw) {
 }
 
 function syncSglPhp() {
-  const names = ['gf-guides.php', 'place-reviews.php', 'place-info.php']
+  const names = ['gf-guides.php', 'place-reviews.php', 'place-info.php', 'community-recipes.php']
   for (const name of names) {
     const from = path.join(SGL_ROOT, 'public', name)
     const to = path.join(__dirname, 'public', name)
     if (fs.existsSync(from)) fs.copyFileSync(from, to)
+  }
+}
+
+function communityRecipesEndpoint() {
+  return {
+    name: 'community-recipes-endpoint',
+    configureServer(server) {
+      server.middlewares.use(communityMiddleware())
+    },
   }
 }
 
@@ -212,7 +230,7 @@ function embedSinGlutenLife() {
 }
 
 export default defineConfig({
-  plugins: [react(), briefingDevEndpoint(), placeInfoEndpoint(), embedSinGlutenLife()],
+  plugins: [react(), briefingDevEndpoint(), communityRecipesEndpoint(), placeInfoEndpoint(), embedSinGlutenLife()],
   server: {
     host: '127.0.0.1',
     port: 5180,
@@ -220,7 +238,7 @@ export default defineConfig({
     // The scraper cache lives in the project folder; writing to it must not
     // reload the browser.
     watch: {
-      ignored: ['**/.cache/**'],
+      ignored: ['**/.cache/**', '**/data/community-recipes.json'],
     },
     fs: {
       allow: [__dirname, SGL_ROOT],
