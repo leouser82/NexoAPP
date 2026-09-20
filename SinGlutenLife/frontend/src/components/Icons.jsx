@@ -15,6 +15,9 @@ export function IconHome() {
 export function IconShop() {
   return <Icon d="M4 9h16l-1.2 11H5.2L4 9zm2-4h12l1 4H5l1-4z" />
 }
+export function IconGlobe() {
+  return <Icon d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM3.6 9h16.8M3.6 15h16.8M12 3c2.6 3 4 6.4 4 9s-1.4 6-4 9c-2.6-3-4-6.4-4-9s1.4-6 4-9z" />
+}
 export function IconPill() {
   return <Icon d="M8.5 15.5 15.5 8.5a4 4 0 0 1 5.6 5.6l-7 7a4 4 0 0 1-5.6-5.6zM7 17l-2 2" />
 }
@@ -31,13 +34,24 @@ export function IconPlus() {
 export function BrandMark() {
   return (
     <div className="brand-mark" aria-hidden>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
         <path
-          d="M6 12.4 10.1 16.6 18.4 8"
+          d="M12 20.2V7.2"
           stroke="#e8f6ff"
-          strokeWidth="2.4"
+          strokeWidth="1.7"
           strokeLinecap="round"
-          strokeLinejoin="round"
+        />
+        <path
+          d="M12 8.2c-1.7-.9-2.8-2.1-2.8-3.4M12 8.2c1.7-.9 2.8-2.1 2.8-3.4M12 11.2c-2-.7-3.3-1.8-3.3-3.1M12 11.2c2-.7 3.3-1.8 3.3-3.1M12 14.1c-2.1-.6-3.5-1.6-3.5-2.8M12 14.1c2.1-.6 3.5-1.6 3.5-2.8"
+          stroke="#e8f6ff"
+          strokeWidth="1.55"
+          strokeLinecap="round"
+        />
+        <path
+          d="M6.2 17.6 17.8 6.4"
+          stroke="#ffc4ae"
+          strokeWidth="2.3"
+          strokeLinecap="round"
         />
       </svg>
     </div>

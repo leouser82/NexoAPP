@@ -87,6 +87,7 @@ const es = {
   ],
   footer: {
     legal: '© 2026 Nexo Soft · Sitios web y sistemas con hosting propio',
+    privacy: 'Privacidad',
     note: 'Se ve bien en la computadora. También en el teléfono.',
   },
 }
@@ -179,6 +180,7 @@ const en = {
   ],
   footer: {
     legal: '© 2026 Nexo Soft · Websites and systems with own hosting',
+    privacy: 'Privacy',
     note: 'It looks good on a computer. On a phone too.',
   },
 }
@@ -271,6 +273,7 @@ const it = {
   ],
   footer: {
     legal: '© 2026 Nexo Soft · Siti e sistemi con hosting proprio',
+    privacy: 'Privacy',
     note: 'Si vede bene sul computer. Anche sul telefono.',
   },
 }
@@ -363,6 +366,7 @@ const fr = {
   ],
   footer: {
     legal: '© 2026 Nexo Soft · Sites et systèmes avec hébergement propre',
+    privacy: 'Confidentialité',
     note: 'Ça se voit bien sur ordinateur. Aussi sur téléphone.',
   },
 }
@@ -455,8 +459,103 @@ const gl = {
   ],
   footer: {
     legal: '© 2026 Nexo Soft · Sitios web e sistemas con hosting propio',
+    privacy: 'Privacidade',
     note: 'Véese ben no computador. Tamén no teléfono.',
   },
 }
 
-export const copies = { es, en, it, fr, gl }
+const pt = {
+  proofAria: 'Por que a Nexo Soft',
+  meta: {
+    title: 'Nexo Soft | Sites e sistemas simples para o seu negócio',
+    description:
+      'Desenhamos sites e sistemas fáceis de usar. Publicamos no nosso hosting e entregamos prontos. Sem jargão técnico: você vende, nós cuidamos da internet.',
+  },
+  nav: { services: 'O que inclui', work: 'Exemplos', process: 'Como funciona', start: 'Começar' },
+  hero: {
+    kicker: 'Sites e sistemas · Hosting próprio',
+    titleBefore: 'O seu negócio, na internet.',
+    titleAccent: 'Fácil de entender.',
+    lede: 'Desenhamos o site ou o sistema que o seu negócio precisa. Fica profissional, entende-se na hora e fica publicado no nosso hosting. Você cuida de vender; nós, de a internet trabalhar para si.',
+    primary: 'Quero o meu site',
+    secondary: 'Como trabalhamos',
+    imageAlt: 'Secretária de um estúdio digital com um portátil e luz azul',
+  },
+  marquee: ['Hosting próprio', 'Site pronto a usar', 'Explicamos com clareza', 'Fica profissional'],
+  proof: [
+    { id: '01', text: 'Hosting próprio: o seu site vive nos nossos servidores. Não tem de se ocupar de domínios, painéis nem de como o publicar.' },
+    { id: '02', text: 'Usamos ferramentas atuais no desenvolvimento. Mais rápido, mais organizado, com revisão no fim.' },
+    { id: '03', text: 'Entregamos a funcionar: o link, como usar e o que fazer cada dia. Sem manuais longos.' },
+  ],
+  servicesIntro: { kicker: 'O que inclui', title: 'Um sistema web pensado para quem tem um negócio.' },
+  services: [
+    { id: '01', title: 'Um site que lhe traz clientes', text: 'A cara do seu negócio na internet: quem é, o que oferece e um botão claro para lhe escreverem. Fica profissional, entende-se na hora e funciona bem no telemóvel.', items: ['Página inicial que explica o seu negócio', 'Pedidos, consultas ou reservas', 'Pronto para partilhar no WhatsApp'], tall: true },
+    { id: '02', title: 'Um sistema para ordenar o trabalho', text: 'Se hoje anota tudo no Excel, Instagram ou de memória, criamos uma ferramenta simples: clientes, turnos, pedidos ou o que o seu negócio precisar.' },
+    { id: '03', title: 'Uma imagem que dá confiança', text: 'Cor, tipografia e estilo para a sua marca se ver cuidada. Quando alguém entra, pensa: “esta gente sabe o que faz”.' },
+    { id: '04', title: 'Da ideia a algo que já se pode usar', text: 'Não é preciso ter tudo definido. Começamos pelo essencial, publicamos e melhoramos consigo.' },
+  ],
+  workIntro: { kicker: 'Exemplos reais', title: 'Assim se vê um sistema quando está feito para se usar.' },
+  case: {
+    tag: 'Saúde · App para o dia a dia',
+    title: 'SinGluten Life',
+    text: 'Uma app para pessoas celíacas: onde comer, receitas e o menu de cada dia. Clara, cálida e fácil de usar. Pensada para a abrir todos os dias, não para impressionar.',
+    items: ['Encontra lugares próximos, de forma direta', 'Receitas à mão, com onde comprar', 'Vê-se e sente-se como uma app de verdade'],
+    open: 'Abrir app →',
+    view: 'Ver a app',
+    similar: 'Pedir um caso semelhante →',
+    imageAlt: 'Mesa com comida sem glúten e a app SinGluten Life no telemóvel',
+  },
+  workItems: [
+    { img: '/assets/work-landing.png', alt: 'Portátil com a página de uma marca sobre uma secretária de mármore', title: 'Página do seu negócio', text: 'Uma só página, uma mensagem clara, para lhe escreverem.' },
+    { img: '/assets/work-redesign.png', alt: 'Identidade visual com cartões e um tablet', title: 'Presença profissional', text: 'De “tenho Instagram” a um site que fecha reuniões.' },
+    { img: '/assets/work-tool.png', alt: 'Painel de uma ferramenta interna num monitor', title: 'Ferramenta do dia a dia', text: 'Menos folhas de cálculo. Mais ordem. Tudo num só lugar.' },
+  ],
+  processIntro: { kicker: 'Como funciona o trabalho', title: 'Da primeira mensagem ao seu site no ar.' },
+  steps: [
+    { title: 'Contacta-nos', text: 'Preenche o formulário ou escreve-nos. Em 24 a 48 horas respondemos, de forma direta.' },
+    { title: 'Falamos', text: 'Numa chamada curta conta-nos o seu negócio: a quem vende e o que precisa que o site faça.' },
+    { title: 'Vê o plano', text: 'O que vai receber, como é o caminho e quanto demora. Vê-o claro antes de começar.' },
+    { title: 'Vê como fica', text: 'Desenhamos a cara do site e mostramos-lha. Ajustamos juntos até dizer “assim”.' },
+    { title: 'Construímos', text: 'Montamos o sistema com ferramentas atuais e mostramos avanços reais.' },
+    { title: 'Recebe-o na internet', text: 'Publicamos no nosso hosting, damos-lhe o acesso e explicamos como usar. Já é seu.' },
+  ],
+  quote: {
+    textBefore: '“Não quero um site difícil. Quero que, quando um cliente entrar, entenda',
+    textAccent: ' o que faço e me escreva.',
+    textAfter: '”',
+    note: 'Isso é o que quase todos nos pedem.',
+  },
+  contact: {
+    kicker: 'Comece aqui',
+    title: 'Conte-nos o que o seu negócio precisa.',
+    lead: 'Respondemos em 24 a 48 horas, em linguagem clara. Se pudermos ajudar, traçamos o caminho. Se não for para nós, dizemos.',
+    slotsBefore: 'Há lugar para ',
+    slotsStrong: '2 projetos este mês',
+    name: 'Nome',
+    namePlaceholder: 'O seu nome',
+    email: 'Email',
+    emailPlaceholder: 'ola@marca.com',
+    need: 'O que gostaria de ter',
+    message: 'Conte-nos numa frase',
+    messagePlaceholder: 'Ex.: tenho um local e quero que as pessoas me escrevam pelo WhatsApp',
+    submit: 'Quero que me escrevam',
+    sending: 'A enviar…',
+    sent: 'Pronto. A mensagem chegou a {email}. Escrevemos em 24–48 h.',
+    activate: 'Acaba de chegar um correio a {email} para ativar o formulário. Abra-o (também o spam), confirme o link e volte a enviar.',
+    fail: 'Não foi possível enviar a partir do site. Escreva-nos para {email}',
+  },
+  needOptions: [
+    'Um site para o meu negócio',
+    'Um sistema para atender clientes',
+    'Renovar a imagem da minha marca',
+    'Começar do zero; ainda não tenho claro',
+    'Quero falar primeiro',
+  ],
+  footer: {
+    legal: '© 2026 Nexo Soft · Sites e sistemas com hosting próprio',
+    privacy: 'Privacidade',
+    note: 'Vê-se bem no computador. Também no telemóvel.',
+  },
+}
+
+export const copies = { es, en, it, fr, pt, gl }

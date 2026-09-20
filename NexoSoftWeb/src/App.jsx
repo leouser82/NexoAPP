@@ -1,3 +1,4 @@
+import Analytics from './components/Analytics.jsx'
 import Background from './components/Background.jsx'
 import Contact from './components/Contact.jsx'
 import Footer from './components/Footer.jsx'
@@ -13,6 +14,7 @@ import { LanguageProvider } from './i18n/LanguageContext.jsx'
 export default function App() {
   return (
     <LanguageProvider>
+      <Analytics />
       <Background />
       <Header />
       <main id="top">

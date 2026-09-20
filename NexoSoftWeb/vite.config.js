@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 import { communityMiddleware } from '../SinGlutenLife/frontend/communityDev.js'
 import { lookupPhoto, lookupPlace } from './placeInfo.js'
 import { celimapRaw } from './scraper/gfGuides.js'
+import { worldGuidePlaces } from './scraper/worldGuides.js'
 import { lookupReviews } from './scraper/googleReviews.js'
 import { build as viteBuild, createServer, defineConfig } from 'vite'
 
@@ -14,6 +15,7 @@ const SGL_BASE = '/singluten/'
 const NEXO_MODULES = path.resolve(__dirname, 'node_modules')
 const SGL_HTACCESS = `RewriteEngine On
 RewriteBase /singluten/
+RewriteRule ^privacidad/?$ /singluten/privacidad.html [L]
 RewriteRule ^index\\.html$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
@@ -77,7 +79,7 @@ function sglApiPath(raw) {
 }
 
 function syncSglPhp() {
-  const names = ['gf-guides.php', 'place-reviews.php', 'place-info.php', 'community-recipes.php']
+  const names = ['gf-guides.php', 'gf-world.php', 'place-reviews.php', 'place-info.php', 'community-recipes.php', 'db-config.php']
   for (const name of names) {
     const from = path.join(SGL_ROOT, 'public', name)
     const to = path.join(__dirname, 'public', name)
@@ -104,8 +106,9 @@ function placeInfoEndpoint() {
         const isInfo = pathName === '/place-info.php' || pathName === '/api/place-info'
         const isPhoto = pathName === '/api/place-photo'
         const isGuides = pathName === '/gf-guides.php'
+        const isWorld = pathName === '/gf-world.php' || pathName === '/api/gf-world'
         const isReviews = pathName === '/place-reviews.php' || pathName === '/api/place-reviews'
-        if (!isInfo && !isPhoto && !isGuides && !isReviews) {
+        if (!isInfo && !isPhoto && !isGuides && !isWorld && !isReviews) {
           return next()
         }
         const url = new URL(req.url, 'http://127.0.0.1')
@@ -124,6 +127,12 @@ function placeInfoEndpoint() {
         try {
           let data
           if (isGuides) data = await celimapRaw()
+          else if (isWorld) {
+            const lat = Number(url.searchParams.get('lat'))
+            const lon = Number(url.searchParams.get('lon'))
+            const places = Number.isFinite(lat) && Number.isFinite(lon) ? await worldGuidePlaces(lat, lon) : []
+            data = { ok: true, places }
+          }
           else if (isReviews) data = await lookupReviews(query)
           else if (isPhoto) data = await lookupPhoto(query)
           else data = await lookupPlace(query)

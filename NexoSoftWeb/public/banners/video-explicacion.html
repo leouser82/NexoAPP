@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SinGluten Life · Video</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Outfit:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #083554;
+        color: #fff;
+        font-family: Outfit, system-ui, sans-serif;
+      }
+      .wrap {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+      .stage {
+        width: 1080px;
+        height: 1920px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 28px;
+        transform-origin: top center;
+        background:
+          radial-gradient(900px 480px at 0% -8%, #b7e4fb 0%, transparent 58%),
+          radial-gradient(760px 420px at 100% 0%, #ffd8cc 0%, transparent 52%),
+          radial-gradient(820px 400px at 70% 100%, #c8f0dd 0%, transparent 55%),
+          #e8f3f9;
+      }
+      .card {
+        position: absolute;
+        inset: 220px 72px 260px;
+        border-radius: 48px;
+        background: linear-gradient(155deg, #073a5c 0%, #0b6ea8 48%, #3cb4e4 100%);
+        box-shadow: 0 24px 48px rgba(12, 43, 69, 0.18);
+        padding: 88px 72px 80px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .scene {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.55s ease;
+      }
+      .scene.on {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      body.export .scene {
+        display: none;
+        opacity: 1;
+        transition: none;
+      }
+      body.export .scene.on {
+        display: block;
+      }
+      .kicker {
+        margin: 0 0 18px;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #ffd8cc;
+      }
+      .title {
+        margin: 0;
+        font-family: Fraunces, Georgia, serif;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 0.98;
+        font-size: 86px;
+      }
+      .lead {
+        margin: 28px 0 0;
+        max-width: 18ch;
+        font-size: 34px;
+        font-weight: 500;
+        line-height: 1.25;
+        color: #e8f6ff;
+      }
+      .points {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 16px;
+        font-size: 32px;
+        font-weight: 600;
+        color: #e8f6ff;
+      }
+      .points span {
+        display: block;
+        margin-top: 4px;
+        font-size: 20px;
+        font-weight: 500;
+        color: #ffd8cc;
+      }
+      .mark {
+        width: 110px;
+        height: 110px;
+        border-radius: 30px;
+        display: grid;
+        place-items: center;
+        background: rgba(232, 246, 255, 0.16);
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        height: 56px;
+        padding: 0 22px;
+        border-radius: 999px;
+        background: #fff;
+        color: #0b6ea8;
+        font-size: 22px;
+        font-weight: 700;
+        text-decoration: none;
+      }
+      .url {
+        margin: 28px 0 0;
+        font-size: 32px;
+        font-weight: 700;
+      }
+      .bar {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        bottom: 180px;
+        height: 4px;
+        border-radius: 99px;
+        background: rgba(255, 255, 255, 0.22);
+        overflow: hidden;
+        z-index: 3;
+      }
+      .bar > i {
+        display: block;
+        height: 100%;
+        width: 0;
+        background: #ffd8cc;
+        transition: width 0.2s linear;
+      }
+      .ui {
+        margin-top: 18px;
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        color: #e8f6ff;
+        font-size: 14px;
+      }
+      .ui button {
+        border: 0;
+        border-radius: 999px;
+        padding: 10px 16px;
+        background: #0b6ea8;
+        color: #fff;
+        font: 700 14px Outfit, system-ui, sans-serif;
+        cursor: pointer;
+      }
+      body.export,
+      body.export .wrap {
+        padding: 0;
+        min-height: 1920px;
+        background: transparent;
+      }
+      body.export .stage {
+        transform: none;
+        border-radius: 0;
+      }
+      body.export .ui,
+      body.export .bar {
+        display: none;
+      }
+      @media (max-height: 980px) {
+        .stage {
+          transform: scale(0.42);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div>
+        <div class="stage" id="stage">
+          <section class="scene on" data-ms="4200">
+            <div class="card">
+              <div>
+                <div class="mark" aria-hidden="true">
+                  <svg width="58" height="58" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 20.2V7.2" stroke="#e8f6ff" stroke-width="1.7" stroke-linecap="round" />
+                    <path
+                      d="M12 8.2c-1.7-.9-2.8-2.1-2.8-3.4M12 8.2c1.7-.9 2.8-2.1 2.8-3.4M12 11.2c-2-.7-3.3-1.8-3.3-3.1M12 11.2c2-.7 3.3-1.8 3.3-3.1M12 14.1c-2.1-.6-3.5-1.6-3.5-2.8M12 14.1c2.1-.6 3.5-1.6 3.5-2.8"
+                      stroke="#e8f6ff"
+                      stroke-width="1.55"
+                      stroke-linecap="round"
+                    />
+                    <path d="M6.2 17.6 17.8 6.4" stroke="#ffc4ae" stroke-width="2.3" stroke-linecap="round" />
+                  </svg>
+                </div>
+                <p class="kicker" style="margin-top: 36px">SinGluten Life</p>
+                <h1 class="title">Comé rico.<br />Comé seguro.</h1>
+                <p class="lead">La app para celíacos: dónde sentarte y qué cocinar hoy.</p>
+              </div>
+              <p class="url">singlutenlife.site</p>
+            </div>
+          </section>
+
+          <section class="scene" data-ms="4800">
+            <div class="card">
+              <div>
+                <p class="kicker">Lugares cercanos</p>
+                <h2 class="title">¿Dónde comemos hoy?</h2>
+                <p class="lead">El mapa se ubica en tu GPS y muestra locales cerca.</p>
+              </div>
+              <ul class="points">
+                <li>Publicados como sin TACC<span>No adivinamos si un lugar es seguro</span></li>
+                <li>Confirmá en el mostrador<span>La app no reemplaza el protocolo</span></li>
+              </ul>
+            </div>
+          </section>
+
+          <section class="scene" data-ms="4600">
+            <div class="card">
+              <div>
+                <p class="kicker">Lugares remotos</p>
+                <h2 class="title">¿Viajás?</h2>
+                <p class="lead">Buscá cualquier ciudad o país. El mapa se mueve con vos.</p>
+              </div>
+              <ul class="points">
+                <li>OpenStreetMap<span>Solo lo que está publicado como sin gluten</span></li>
+                <li>Argentina y el mundo</li>
+              </ul>
+            </div>
+          </section>
+
+          <section class="scene" data-ms="4800">
+            <div class="card">
+              <div>
+                <p class="kicker">En casa</p>
+                <h2 class="title">Hoy la mesa está de tu lado.</h2>
+                <p class="lead">Una receta distinta cada día, con dónde comprar lo que falta.</p>
+              </div>
+              <ul class="points">
+                <li>Paso a paso</li>
+                <li>Logo sin TACC en el paquete<span>No es una certificación</span></li>
+              </ul>
+            </div>
+          </section>
+
+          <section class="scene" data-ms="4400">
+            <div class="card">
+              <div>
+                <p class="kicker">La mesa de todos</p>
+                <h2 class="title">Hoy cocinás vos.</h2>
+                <p class="lead">Un plato de tu cocina, con tu nombre. Entrá con Google y dejalo en la mesa.</p>
+              </div>
+              <ul class="points">
+                <li>Comunidad, no sello<span>En cada paquete, el logo sin TACC</span></li>
+              </ul>
+            </div>
+          </section>
+
+          <section class="scene" data-ms="5200">
+            <div class="card">
+              <div>
+                <div class="mark" aria-hidden="true">
+                  <svg width="58" height="58" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 20.2V7.2" stroke="#e8f6ff" stroke-width="1.7" stroke-linecap="round" />
+                    <path
+                      d="M12 8.2c-1.7-.9-2.8-2.1-2.8-3.4M12 8.2c1.7-.9 2.8-2.1 2.8-3.4M12 11.2c-2-.7-3.3-1.8-3.3-3.1M12 11.2c2-.7 3.3-1.8 3.3-3.1M12 14.1c-2.1-.6-3.5-1.6-3.5-2.8M12 14.1c2.1-.6 3.5-1.6 3.5-2.8"
+                      stroke="#e8f6ff"
+                      stroke-width="1.55"
+                      stroke-linecap="round"
+                    />
+                    <path d="M6.2 17.6 17.8 6.4" stroke="#ffc4ae" stroke-width="2.3" stroke-linecap="round" />
+                  </svg>
+                </div>
+                <p class="kicker" style="margin-top: 36px">Gratis</p>
+                <h2 class="title">Entrá y usala hoy.</h2>
+                <p class="lead">Lugares. Recetas. La mesa de todos.</p>
+              </div>
+              <div>
+                <a class="chip" href="https://singlutenlife.site/">Entrá a la app</a>
+                <p class="url">singlutenlife.site</p>
+              </div>
+            </div>
+          </section>
+          <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+        </div>
+        <div class="ui">
+          <button type="button" id="toggle">Pausa</button>
+          <span>Reel 9:16 · ~30 s · se puede subir a Instagram</span>
+        </div>
+      </div>
+    </div>
+    <script>
+      const scenes = [...document.querySelectorAll('.scene')]
+      const bar = document.getElementById('bar')
+      const toggle = document.getElementById('toggle')
+      const wanted = new URLSearchParams(location.search).get('scene')
+      if (new URLSearchParams(location.search).has('export')) document.body.classList.add('export')
+      let i = 0
+      let playing = wanted === null
+      let started = 0
+      let hold = Number(scenes[0].dataset.ms)
+
+      function show(n) {
+        scenes.forEach((el, idx) => el.classList.toggle('on', idx === n))
+        i = n
+        hold = Number(scenes[n].dataset.ms)
+        started = performance.now()
+        bar.style.width = '0%'
+      }
+
+      if (wanted !== null) {
+        show(Math.max(0, Math.min(scenes.length - 1, Number(wanted))))
+        playing = false
+        toggle.textContent = 'Play'
+      }
+
+      function tick(now) {
+        if (playing) {
+          const p = Math.min(1, (now - started) / hold)
+          bar.style.width = p * 100 + '%'
+          if (p >= 1) show((i + 1) % scenes.length)
+        }
+        requestAnimationFrame(tick)
+      }
+      requestAnimationFrame(tick)
+
+      toggle.addEventListener('click', () => {
+        playing = !playing
+        toggle.textContent = playing ? 'Pausa' : 'Play'
+        if (playing) started = performance.now() - (parseFloat(bar.style.width) / 100) * hold
+      })
+    </script>
+  </body>
+</html>

@@ -3,7 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), 'public', 'data')
-const file = path.join(dir, 'community-recipes.json')
+const file = path.join(dir, 'community-recipes.json') // solo Vite local; en Hostinger usa MySQL
 
 function readAll() {
   try {
@@ -17,6 +17,12 @@ function readAll() {
 function writeAll(recipes) {
   fs.mkdirSync(dir, { recursive: true })
   fs.writeFileSync(file, JSON.stringify({ recipes }, null, 2))
+}
+
+function cleanPicture(value) {
+  const url = String(value || '').trim()
+  if (!url.startsWith('https://') || url.length > 2000) return ''
+  return url
 }
 
 function cleanText(value, max) {
@@ -70,7 +76,7 @@ function sanitize(input) {
     author: {
       id: cleanText(input.author?.id, 80),
       name: authorName,
-      picture: String(input.author?.picture || '').slice(0, 500),
+      picture: cleanPicture(input.author?.picture),
       provider: input.author?.provider === 'facebook' ? 'facebook' : 'google',
     },
     createdAt: Date.now(),
@@ -110,12 +116,36 @@ export function communityMiddleware() {
     req.on('end', () => {
       try {
         const raw = JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}')
+        if (raw.action === 'delete') {
+          const id = String(raw.id || '')
+          const authorId = cleanText(raw.author?.id, 80)
+          if (!/^c-[a-z0-9]+$/i.test(id) || !authorId) {
+            send(400, { ok: false, error: 'invalid' })
+            return
+          }
+          const current = readAll()
+          const target = current.find((item) => item.id === id)
+          if (target && target.author?.id && target.author.id !== authorId) {
+            send(403, { ok: false, error: 'forbidden' })
+            return
+          }
+          writeAll(current.filter((item) => item.id !== id))
+          send(200, { ok: true, deleted: id })
+          return
+        }
         const recipe = sanitize(raw)
         if (!recipe) {
           send(400, { ok: false, error: 'invalid' })
           return
         }
-        const recipes = [recipe, ...readAll().filter((item) => item.id !== recipe.id)].slice(0, 80)
+        const current = readAll()
+        const prev = current.find((item) => item.id === recipe.id)
+        if (prev?.author?.id && recipe.author?.id && prev.author.id !== recipe.author.id) {
+          send(403, { ok: false, error: 'forbidden' })
+          return
+        }
+        if (prev?.createdAt) recipe.createdAt = prev.createdAt
+        const recipes = [recipe, ...current.filter((item) => item.id !== recipe.id)].slice(0, 80)
         writeAll(recipes)
         send(200, { ok: true, recipe })
       } catch {

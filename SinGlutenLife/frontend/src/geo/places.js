@@ -1,5 +1,11 @@
-import { distanceKm } from './geo.js'
-import { loadGuidePlaces, mergeGuidePlaces, osmGlutenQuery, osmToGuidePlace } from './guides.js'
+import { distanceKm, searchPublishedGf } from './geo.js'
+import {
+  loadGuidePlaces,
+  mergeGuidePlaces,
+  osmFastGfQuery,
+  osmGlutenQuery,
+  osmToGuidePlace,
+} from './guides.js'
 
 /**
  * The list only carries places that a gluten-free guide publishes as such.
@@ -8,8 +14,9 @@ import { loadGuidePlaces, mergeGuidePlaces, osmGlutenQuery, osmToGuidePlace } fr
  */
 
 const OVERPASS_ENDPOINTS = [
-  'https://overpass-api.de/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
+  'https://lz4.overpass-api.de/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter',
 ]
 
 const GF_KM = 25
@@ -54,27 +61,44 @@ function guideToPlace(item, origin) {
   }
 }
 
-async function overpass(query, timeoutMs = 15000) {
-  for (const endpoint of OVERPASS_ENDPOINTS) {
-    const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), timeoutMs)
+async function overpassOnce(url, query, timeoutMs, signal) {
+  if (signal?.aborted) throw new DOMException('aborted', 'AbortError')
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
+  const onAbort = () => controller.abort()
+  signal?.addEventListener('abort', onAbort)
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+      body: new URLSearchParams({ data: query }),
+      signal: controller.signal,
+    })
+    if (!response.ok) throw new Error(`http-${response.status}`)
+    const data = await response.json()
+    if (!data?.elements) throw new Error('no-elements')
+    return data.elements
+  } finally {
+    clearTimeout(timer)
+    signal?.removeEventListener('abort', onAbort)
+  }
+}
+
+async function overpass(query, timeoutMs = 7000, signal) {
+  let lastError
+  for (const url of OVERPASS_ENDPOINTS) {
     try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-        body: new URLSearchParams({ data: query }),
-        signal: controller.signal,
-      })
-      if (!response.ok) continue
-      const data = await response.json()
-      if (data?.elements) return data.elements
-    } catch {
-      // se prueba el espejo siguiente
-    } finally {
-      clearTimeout(timer)
+      return await overpassOnce(url, query, timeoutMs, signal)
+    } catch (error) {
+      lastError = error
+      if (error?.name === 'AbortError' && signal?.aborted) throw error
     }
   }
-  return []
+  throw lastError || new Error('overpass')
+}
+
+function inArgentina(lat, lon) {
+  return lat >= -55.2 && lat <= -21.7 && lon >= -73.6 && lon <= -53.5
 }
 
 async function fetchOsmGluten(lat, lon) {
@@ -100,4 +124,45 @@ export async function fetchNearbyPlaces(lat, lon, onPartial) {
     .slice(0, MAX_PLACES)
 
   return { all: merged, places: merged, pharmacies: [] }
+}
+
+function toList(items, lat, lon, km) {
+  return mergeGuidePlaces(items)
+    .map((item) => guideToPlace(item, { lat, lon }))
+    .filter((place) => place.distanceKm <= km)
+    .sort((a, b) => a.distanceKm - b.distanceKm)
+    .slice(0, MAX_PLACES)
+}
+
+/** En Argentina las guías. Afuera, OSM/Photon de esa ciudad, no un JSON fijo. */
+export async function fetchRemotePlaces(lat, lon, onPartial, options = {}) {
+  const km = Number.isFinite(options.km) ? options.km : 40
+  const signal = options.signal
+  if (signal?.aborted) throw new DOMException('aborted', 'AbortError')
+
+  if (inArgentina(lat, lon)) {
+    const guide = await loadGuidePlaces(lat, lon, km).catch(() => [])
+    const places = toList(guide, lat, lon, km)
+    onPartial?.({ all: places, places, pharmacies: [] })
+    return { all: places, places, pharmacies: [] }
+  }
+
+  const namedTask = searchPublishedGf(lat, lon, km, {
+    hint: options.hint || '',
+    countryCode: options.countryCode || '',
+    countryName: options.countryName || '',
+    signal,
+  }).catch(() => [])
+  const osmTask = overpass(osmFastGfQuery(lat, lon, km), 7000, signal).catch(() => [])
+
+  const named = await namedTask
+  if (named.length) {
+    const early = toList(named, lat, lon, km)
+    onPartial?.({ all: early, places: early, pharmacies: [] })
+  }
+
+  const elements = await osmTask
+  const places = toList([...named, ...elements.map(osmToGuidePlace).filter(Boolean)], lat, lon, km)
+  onPartial?.({ all: places, places, pharmacies: [] })
+  return { all: places, places, pharmacies: [] }
 }

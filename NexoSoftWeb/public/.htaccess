@@ -1,4 +1,10 @@
+<Files "db-config.php">
+  Require all denied
+</Files>
+
 RewriteEngine On
+
+RewriteRule ^privacidad/?$ /privacidad.html [L]
 
 RewriteRule ^api/place-info$ /place-info.php [L,QSA]
 RewriteRule ^api/place-photo$ /place-info.php [L,QSA]

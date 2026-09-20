@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>SinGluten Life · Instagram</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Outfit:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #0c2b45;
+        color: #e8f6ff;
+        font-family: Outfit, system-ui, sans-serif;
+      }
+      .page {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 48px 24px 80px;
+      }
+      .intro h1 {
+        margin: 0 0 8px;
+        font-family: Fraunces, Georgia, serif;
+        font-size: 36px;
+      }
+      .intro p {
+        margin: 0 0 36px;
+        color: #9ec3d8;
+        max-width: 46rem;
+        line-height: 1.45;
+      }
+      .pack {
+        display: flex;
+        flex-direction: column;
+        gap: 48px;
+        align-items: start;
+      }
+      .item label {
+        display: block;
+        margin: 0 0 12px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #7ec8e8;
+      }
+      .board {
+        display: block;
+        position: relative;
+        overflow: hidden;
+        color: #0c2b45;
+        text-decoration: none;
+        background:
+          radial-gradient(900px 480px at 0% -8%, #b7e4fb 0%, transparent 58%),
+          radial-gradient(760px 420px at 100% 0%, #ffd8cc 0%, transparent 52%),
+          radial-gradient(820px 400px at 70% 100%, #c8f0dd 0%, transparent 55%),
+          #e8f3f9;
+      }
+      .square {
+        width: 1080px;
+        height: 1080px;
+      }
+      .story {
+        width: 1080px;
+        height: 1920px;
+      }
+      .card {
+        position: absolute;
+        inset: 72px;
+        border-radius: 48px;
+        background: linear-gradient(155deg, #073a5c 0%, #0b6ea8 48%, #3cb4e4 100%);
+        box-shadow: 0 24px 48px rgba(12, 43, 69, 0.18);
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 72px 68px 64px;
+      }
+      .story .card {
+        inset: 220px 72px 260px;
+        padding: 88px 72px 80px;
+      }
+      .kicker {
+        margin: 0 0 18px;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #ffd8cc;
+      }
+      .title {
+        margin: 0;
+        font-family: Fraunces, Georgia, serif;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 0.98;
+        font-size: 86px;
+      }
+      .story .title {
+        font-size: 96px;
+      }
+      .lead {
+        margin: 28px 0 0;
+        max-width: 16ch;
+        font-size: 34px;
+        font-weight: 500;
+        line-height: 1.25;
+        color: #e8f6ff;
+      }
+      .story .lead {
+        max-width: 18ch;
+        font-size: 36px;
+      }
+      .mark {
+        width: 92px;
+        height: 92px;
+        border-radius: 26px;
+        display: grid;
+        place-items: center;
+        background: rgba(232, 246, 255, 0.16);
+      }
+      .story .mark {
+        width: 110px;
+        height: 110px;
+        border-radius: 30px;
+      }
+      .foot {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 24px;
+      }
+      .points {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 14px;
+        font-size: 28px;
+        font-weight: 600;
+        color: #e8f6ff;
+      }
+      .points span {
+        display: block;
+        font-size: 18px;
+        font-weight: 500;
+        color: #ffd8cc;
+        margin-top: 2px;
+      }
+      .url {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: 0.01em;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        height: 56px;
+        padding: 0 22px;
+        border-radius: 999px;
+        background: #fff;
+        color: #0b6ea8;
+        font-size: 22px;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="intro">
+        <h1>Banners de Instagram</h1>
+        <p>
+          Tres posts de 1080×1080 y una historia de 1080×1920. Capturá cada recuadro (o imprimí a PNG) y subilos a Instagram.
+          Texto en zona segura, lejos de la UI de Stories.
+        </p>
+      </div>
+      <div class="pack">
+        <div class="item">
+          <label>1 · Feed 1080×1080 · Marca</label>
+          <a class="board square" id="ig-marca" href="https://singlutenlife.site/">
+            <div class="card">
+              <div>
+                <p class="kicker">App para celíacos</p>
+                <h2 class="title">Comé rico.<br />Comé seguro.</h2>
+                <p class="lead">Lugares sin TACC cerca y una receta nueva todos los días.</p>
+              </div>
+              <div class="foot">
+                <div>
+                  <div class="mark" aria-hidden="true">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 20.2V7.2" stroke="#e8f6ff" stroke-width="1.7" stroke-linecap="round" />
+                      <path
+                        d="M12 8.2c-1.7-.9-2.8-2.1-2.8-3.4M12 8.2c1.7-.9 2.8-2.1 2.8-3.4M12 11.2c-2-.7-3.3-1.8-3.3-3.1M12 11.2c2-.7 3.3-1.8 3.3-3.1M12 14.1c-2.1-.6-3.5-1.6-3.5-2.8M12 14.1c2.1-.6 3.5-1.6 3.5-2.8"
+                        stroke="#e8f6ff"
+                        stroke-width="1.55"
+                        stroke-linecap="round"
+                      />
+                      <path d="M6.2 17.6 17.8 6.4" stroke="#ffc4ae" stroke-width="2.3" stroke-linecap="round" />
+                    </svg>
+                  </div>
+                  <p class="url" style="margin-top: 18px">SinGluten Life</p>
+                </div>
+                <p class="url">singlutenlife.site</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="item">
+          <label>2 · Feed 1080×1080 · Lugares</label>
+          <a class="board square" id="ig-lugares" href="https://singlutenlife.site/lugares">
+            <div class="card">
+              <div>
+                <p class="kicker">Lugares cercanos</p>
+                <h2 class="title">¿Dónde comemos hoy?</h2>
+                <p class="lead">Locales ya publicados como sin TACC. No adivinamos. No inventamos.</p>
+              </div>
+              <ul class="points">
+                <li>Cerca de tu GPS<span>Argentina y el mundo</span></li>
+                <li>Confirmá en el mostrador<span>La app no reemplaza el protocolo</span></li>
+              </ul>
+              <div class="foot">
+                <span class="chip">Entrá y abrí el mapa</span>
+                <p class="url">singlutenlife.site</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="item">
+          <label>3 · Feed 1080×1080 · Recetas</label>
+          <a class="board square" id="ig-recetas" href="https://singlutenlife.site/recetas">
+            <div class="card">
+              <div>
+                <p class="kicker">En casa</p>
+                <h2 class="title">Hoy la mesa está de tu lado.</h2>
+                <p class="lead">Una receta distinta cada día, con dónde comprar lo que falta.</p>
+              </div>
+              <ul class="points">
+                <li>Paso a paso<span>De varias fuentes y de la comunidad</span></li>
+                <li>Logo sin TACC en el paquete<span>No es una certificación</span></li>
+              </ul>
+              <div class="foot">
+                <span class="chip">Ver receta del día</span>
+                <p class="url">singlutenlife.site</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="item">
+          <label>4 · Historia 1080×1920 · Llamado</label>
+          <a class="board story" id="ig-historia" href="https://singlutenlife.site/">
+            <div class="card">
+              <div>
+                <div class="mark" aria-hidden="true">
+                  <svg width="58" height="58" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 20.2V7.2" stroke="#e8f6ff" stroke-width="1.7" stroke-linecap="round" />
+                    <path
+                      d="M12 8.2c-1.7-.9-2.8-2.1-2.8-3.4M12 8.2c1.7-.9 2.8-2.1 2.8-3.4M12 11.2c-2-.7-3.3-1.8-3.3-3.1M12 11.2c2-.7 3.3-1.8 3.3-3.1M12 14.1c-2.1-.6-3.5-1.6-3.5-2.8M12 14.1c2.1-.6 3.5-1.6 3.5-2.8"
+                      stroke="#e8f6ff"
+                      stroke-width="1.55"
+                      stroke-linecap="round"
+                    />
+                    <path d="M6.2 17.6 17.8 6.4" stroke="#ffc4ae" stroke-width="2.3" stroke-linecap="round" />
+                  </svg>
+                </div>
+                <p class="kicker" style="margin-top: 36px">SinGluten Life</p>
+                <h2 class="title">Comé rico.<br />Comé seguro.</h2>
+                <p class="lead">Gratis. Clara. Para abrirla todos los días.</p>
+              </div>
+              <ul class="points">
+                <li>Lugares cerca</li>
+                <li>Receta del día</li>
+                <li>La mesa de todos</li>
+              </ul>
+              <div>
+                <span class="chip">Entrá a la app</span>
+                <p class="url" style="margin-top: 28px">singlutenlife.site</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

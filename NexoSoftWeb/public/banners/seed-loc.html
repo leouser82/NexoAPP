@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>seed</title>
+  </head>
+  <body>
+    <script>
+      const next = new URLSearchParams(location.search).get('to') || '/singluten/'
+      localStorage.setItem('nexo-sgl-lang', 'es')
+      localStorage.setItem(
+        'sgl-last-loc-v1',
+        JSON.stringify({
+          lat: -34.6628,
+          lon: -58.365,
+          label: 'Avellaneda',
+          source: 'manual',
+          at: Date.now(),
+        }),
+      )
+      location.replace(next)
+    </script>
+  </body>
+</html>

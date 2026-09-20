@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useAuth } from '../auth/AuthContext.jsx'
+import CookBy from '../components/CookBy.jsx'
 import RecipePhoto from '../components/RecipePhoto.jsx'
 import { formatDistance } from '../geo/geo.js'
 import { loadGroceryShops, mapsShopUrl, shopForIngredient } from '../geo/ingredientShops.js'
@@ -13,12 +15,16 @@ export default function RecetaDetalle() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { t } = useI18n()
-  const { allRecipes } = useCommunity()
+  const { user } = useAuth()
+  const { allRecipes, remove } = useCommunity()
   const { coords, places, placesStatus } = useLocationData()
   const recipe = allRecipes.find((item) => item.id === id)
   const waiting = !recipe && String(id || '').startsWith('c-')
+  const owned = Boolean(recipe?.community && user?.id && recipe.author?.id === user.id)
   const [shops, setShops] = useState([])
   const [shopStatus, setShopStatus] = useState('idle')
+  const [pendingDelete, setPendingDelete] = useState(false)
+  const [busy, setBusy] = useState(false)
 
   useEffect(() => {
     let alive = true
@@ -36,6 +42,21 @@ export default function RecetaDetalle() {
       alive = false
     }
   }, [coords?.lat, coords?.lon, places])
+
+  async function onDelete() {
+    if (!recipe || !user) return
+    if (!pendingDelete) {
+      setPendingDelete(true)
+      return
+    }
+    setBusy(true)
+    try {
+      await remove(recipe, user)
+      navigate('/recetas')
+    } finally {
+      setBusy(false)
+    }
+  }
 
   if (!recipe) {
     return (
@@ -67,16 +88,32 @@ export default function RecetaDetalle() {
         <span>{t('home.servings', { n: recipe.servings })}</span>
         <span>{labelOf(t, 'diff', recipe.difficulty)}</span>
       </div>
-      <p className="note">
-        {recipe.community ? t('cook.byCook') : t('recipe.by')}{' '}
-        {recipe.sourceUrl ? (
-          <a className="maps-link" href={recipe.sourceUrl} target="_blank" rel="noreferrer">
-            {recipe.sourceName}
-          </a>
+      <p className="note cook-by-line">
+        {recipe.community ? (
+          <CookBy recipe={recipe} />
         ) : (
-          <strong>{recipe.sourceName}</strong>
+          <>
+            {t('recipe.by')}{' '}
+            {recipe.sourceUrl ? (
+              <a className="maps-link" href={recipe.sourceUrl} target="_blank" rel="noreferrer">
+                {recipe.sourceName}
+              </a>
+            ) : (
+              <strong>{recipe.sourceName}</strong>
+            )}
+          </>
         )}
       </p>
+      {owned ? (
+        <div className="cook-detail-actions">
+          <Link className="linkish" to={`/recetas/nueva?editar=${recipe.id}`}>
+            {t('cook.edit')}
+          </Link>
+          <button type="button" className="text-btn" disabled={busy} onClick={onDelete}>
+            {pendingDelete ? t('cook.deleteAsk') : t('cook.delete')}
+          </button>
+        </div>
+      ) : null}
       {recipe.community ? <p className="banner-proto">{t('cook.hint')}</p> : null}
 
       <h3 style={{ fontFamily: 'Fraunces, Georgia, serif' }}>{t('recipe.how')}</h3>
