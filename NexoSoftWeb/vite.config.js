@@ -48,6 +48,7 @@ function sglInlineConfig(extra = {}) {
         react: pkg('react'),
         'react-dom': pkg('react-dom'),
         'react-router-dom': pkg('react-router-dom'),
+        'country-state-city': pkg('country-state-city'),
       },
     },
     ...extra,
