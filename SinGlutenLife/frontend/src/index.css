@@ -1697,6 +1697,27 @@ input[type='range'] {
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+.mine-map {
+  height: 280px;
+  margin: 8px 0 14px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.mine-address-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.mine-address-row label {
+  min-width: 0;
+}
+
+.mine-address-street {
+  grid-template-columns: 1fr 7rem;
+}
+
 .cook-local label,
 .cook-pane label {
   display: block;
